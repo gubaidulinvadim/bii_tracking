@@ -13,4 +13,5 @@
 module load tools/python/anaconda3 
 export PYTHONPATH='/home/sources/physmach/gubaidulin/PyHEADTAIL/'
 
-python ${FILE} ${SLURM_ARRAY_TASK_ID} ${CHROMATICITY_0} ${dQmax} ${TMP_FOLDER} ${RATIO}
+FILE='/home/sources/physmach/gubaidulin/fbii_pyht_tracking/weak-strong-ions.py'
+python ${FILE} ${SLURM_ARRAY_TASK_ID}

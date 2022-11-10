@@ -81,7 +81,8 @@ def run(n_macroparticles):
         return 0
 
 if __name__ == "__main__":
-    n_macroparticles = int(sys.argv[1])
-    run(n_macroparticles)
+    slurm_array_task_id = int(sys.argv[1])
+    n_macroparticles = np.array([int(1e3), int(5e3), int(1e4), int(5e4), int(1e5), int(5e5), int(1e6)])
+    run(n_macroparticles[slurm_array_task_id])
     sys.exit()
     
