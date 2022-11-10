@@ -48,12 +48,12 @@ def run(n_macroparticles):
                                                     limit_n_rms_x=3., limit_n_rms_y=3.,
                                                     printer=SilentPrinter()
                                                     ).generate()
-    electron_bunch.z += h*CIRCUMFERENCE/H_RF
-    electron_bunch_list.append(electron_bunch)
-    filename = 'Results/BM_(n_bunch={0:}, n_macro={1:.1e})'.format(int(h), n_macroparticles)
-    bunch_monitor = BunchMonitor(filename, n_steps=N_SEGMENTS*N_TURNS, parameters_dict=None,
-                 write_buffer_every=50, buffer_size=100,)
-    monitor_list.append(bunch_monitor)
+        electron_bunch.z += h*CIRCUMFERENCE/H_RF
+        electron_bunch_list.append(electron_bunch)
+        filename = '/home/sources/physmach/gubaidulin/fbii_pyht_tracking/Results/BM_(n_bunch={0:}, n_macro={1:.1e})'.format(int(h), n_macroparticles)
+        bunch_monitor = BunchMonitor(filename, n_steps=N_SEGMENTS*N_TURNS, parameters_dict=None,
+                     write_buffer_every=50, buffer_size=100,)
+        monitor_list.append(bunch_monitor)
 
 
     s = np.arange(0, N_SEGMENTS + 1) * CIRCUMFERENCE / N_SEGMENTS
