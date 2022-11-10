@@ -6,6 +6,7 @@ from PyHEADTAIL.particles import generators
 from PyHEADTAIL.general.printers import SilentPrinter
 from PyHEADTAIL.trackers.longitudinal_tracking import RFSystems
 from PyHEADTAIL.trackers.transverse_tracking import TransverseMap
+from PyHEADTAIL.monitors.monitors import BunchMonitor
 from PyHEADTAIL.ion_cloud.ion_cloud import BeamIonElement
 # from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from PyHEADTAIL.general import pmath as pm
@@ -19,7 +20,7 @@ np.random.seed(42)
 PHI_RF = np.arccos(U_LOSS/V_RF) if (GAMMA**-2-GAMMA_T**-2) < 0 else pi+np.arccos(U_LOSS/V_RF)
 PHI_RF=0
 
-def run(N_MACROPARTICLES):
+def run(n_macroparticles):
     np.random.seed(42)
     PHI_RF = np.arccos(U_LOSS/V_RF) if (GAMMA**-2-GAMMA_T**-2) < 0 else pi+np.arccos(U_LOSS/V_RF)
     long_map = RFSystems(
@@ -33,8 +34,9 @@ def run(N_MACROPARTICLES):
         charge=e
         )    
     electron_bunch_list = []
+    monitor_list = []
     for ind, h in enumerate(range(H_RF)):
-        electron_bunch = generators.ParticleGenerator(macroparticlenumber=N_MACROPARTICLES,
+        electron_bunch = generators.ParticleGenerator(macroparticlenumber=n_macroparticles,
                                                     intensity=INTENSITY_PER_BUNCH,
                                                     charge=e, gamma=GAMMA, mass=m_p,
                                                     circumference=CIRCUMFERENCE,
@@ -48,6 +50,11 @@ def run(N_MACROPARTICLES):
                                                     ).generate()
     electron_bunch.z += h*CIRCUMFERENCE/H_RF
     electron_bunch_list.append(electron_bunch)
+    filename = 'Results/BM_(n_bunch={0:}, n_macro={1:.1e})'.format(int(h), n_macroparticles)
+    bunch_monitor = BunchMonitor(filename, n_steps=N_SEGMENTS*N_TURNS, parameters_dict=None,
+                 write_buffer_every=50, buffer_size=100,)
+    monitor_list.append(bunch_monitor)
+
 
     s = np.arange(0, N_SEGMENTS + 1) * CIRCUMFERENCE / N_SEGMENTS
     alpha_x, alpha_y = ALPHA_X_SMOOTH * \
@@ -68,7 +75,9 @@ def run(N_MACROPARTICLES):
         for index, m_ in enumerate(trans_one_turn):
             for bunch_index, electron_bunch in enumerate(electron_bunch_list):
                 m_.track(electron_bunch)    
-                long_map.track(electron_bunch)    
+                long_map.track(electron_bunch)
+                if index % 2 ==0:
+                    monitor_list[bunch_index].dump(electron_bunch)    
         return 0
 
 if __name__ == "__main__":
