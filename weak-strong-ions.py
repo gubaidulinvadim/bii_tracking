@@ -20,7 +20,7 @@ np.random.seed(42)
 PHI_RF = np.arccos(U_LOSS/V_RF) if (GAMMA**-2-GAMMA_T**-2) < 0 else pi+np.arccos(U_LOSS/V_RF)
 PHI_RF=0
 
-def run(n_macroparticles):
+def run(n_macroparticles, n_macroparticles_ions):
     np.random.seed(42)
     PHI_RF = np.arccos(U_LOSS/V_RF) if (GAMMA**-2-GAMMA_T**-2) < 0 else pi+np.arccos(U_LOSS/V_RF)
     long_map = RFSystems(
@@ -50,7 +50,9 @@ def run(n_macroparticles):
                                                     ).generate()
         electron_bunch.z += h*CIRCUMFERENCE/H_RF
         electron_bunch_list.append(electron_bunch)
-        filename = '/home/sources/physmach/gubaidulin/fbii_pyht_tracking/Results/BM_(n_bunch={0:}, n_macro={1:.1e})'.format(int(h), n_macroparticles)
+        filename = '/home/sources/physmach/gubaidulin/fbii_pyht_tracking/Results/BM_(n_bunch={0:}, n_macro={1:.1e}, n_macro_ions={2:.1e})'.format(int(h),
+         n_macroparticles, 
+         n_macroparticles_ions)
         bunch_monitor = BunchMonitor(filename, n_steps=N_SEGMENTS*N_TURNS, parameters_dict=None,
                      write_buffer_every=50, buffer_size=100,)
         monitor_list.append(bunch_monitor)
@@ -68,7 +70,7 @@ def run(n_macroparticles):
     trans_one_turn = [m for m in trans_map]
     beam_ion_elements = []
     for ind, m in enumerate(trans_one_turn):
-        beam_ion_elements.append(BeamIonElement())
+        beam_ion_elements.append(BeamIonElement(n_macroparticles_max = n_macroparticles_ions))
     trans_one_turn = [item for sublist in zip(trans_one_turn, beam_ion_elements) for item in sublist]
     for turn in range(N_TURNS):
 # turn = 0
@@ -83,6 +85,6 @@ def run(n_macroparticles):
 if __name__ == "__main__":
     slurm_array_task_id = int(sys.argv[1])
     n_macroparticles = np.array([int(1e3), int(5e3), int(1e4), int(5e4), int(1e5), int(5e5), int(1e6)])
-    run(n_macroparticles[slurm_array_task_id])
+    run(n_macroparticles[slurm_array_task_id], n_macroparticles_ions=int(1e4))
     sys.exit()
     
