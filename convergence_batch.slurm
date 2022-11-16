@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=FBII_convergence
 #SBATCH --partition=sumo
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=begin,end,requeue
 #SBATCH --mail-user=gubaidulinvadim@gmail.com
 #SBATCH --time=20:00:00
 #SBATCH --array=0-4
