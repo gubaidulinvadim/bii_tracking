@@ -13,7 +13,7 @@ from PyHEADTAIL.general import pmath as pm
 from scipy.constants import m_p
 from SOLEILII_parameters.SOLEILII_CDR_parameters import *
 import numpy as np
-N_TURNS = int(1)
+N_TURNS = int(1000)
 H_RF = 416
 N_SEGMENTS = int(500)
 np.random.seed(42)
