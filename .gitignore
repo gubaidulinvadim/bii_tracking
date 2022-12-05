@@ -1,4 +1,5 @@
 #Ignore all hdf5 files
 *.hdf5
 *.h5
+*.h5part
 *.pyc
