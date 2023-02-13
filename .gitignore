@@ -3,3 +3,7 @@
 *.h5
 *.h5part
 *.pyc
+*.pdf
+*.svg
+*.png
+*checkpoint*
