@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=FBIIcnvrgnc
+#SBATCH --job-name=e_mp
 #SBATCH --partition=sumo
 #SBATCH --mail-type=begin,end,requeue
 #SBATCH --mail-user='gubaidulinvadim@gmail.com'

@@ -117,16 +117,16 @@ def run(n_macroparticles, n_macroparticles_ions, n_gaps=0, n_segments=50, gap_ev
     BI = BeamIonElement()
     beam_ion_elements = []
     for ind, m in enumerate(trans_one_turn):
-        if ind == 0:
-                beam_ion_elements.append(BeamIonElement(dist_ions='GS',
-                                                        monitor_name=folder+'IM(ind={0:})'.format(int(ind)),
-                                                        # use_particle_monitor=True,
-                                                        n_segments=n_segments,
-                                                        set_aperture=True,
-                                                        n_macroparticles_max = n_macroparticles_ions,
-                                                        n_steps=int(H_RF*N_TURNS)))
+    #     if ind == 0:
+    #             beam_ion_elements.append(BeamIonElement(dist_ions='GS',
+    #                                                     monitor_name=folder+'IM(ind={0:})'.format(int(ind)),
+    #                                                     use_particle_monitor=True,
+    #                                                     n_segments=n_segments,
+    #                                                     set_aperture=True,
+    #                                                     n_macroparticles_max = n_macroparticles_ions,
+    #                                                     n_steps=int(H_RF*N_TURNS)))
         beam_ion_elements.append(BeamIonElement(dist_ions='GS',
-                                                # monitor_name=folder+'IM(ind={0:})'.format(int(ind)),
+                                                monitor_name=folder+'IM(ind={0:})'.format(int(ind)),
                                                 set_aperture=True,
                                                 n_segments=n_segments,
                                                 n_macroparticles_max = n_macroparticles_ions,
