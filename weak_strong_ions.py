@@ -12,27 +12,32 @@ import PyHEADTAIL
 from tqdm import tqdm
 import os
 import sys
-os.system('export PYTHONPATH=/home/sources/physmach/gubaidulin/PyHEADTAIL/')
+os.system('export PYTHONPATH=/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/')
 os.system('echo ${PYTHONPATH}')
 # from PyHEADTAIL.particles.slicing import UniformBinSlicer
 N_TURNS = int(500)
 H_RF = 416
-N_SEGMENTS = int(50)
+N_SEGMENTS = int(25)
 PHI_RF = 0
 
 
-def run(n_macroparticles, n_macroparticles_ions, n_gaps=0, n_segments=50, gap_every_104=False):
-    folder = '/work/sources/grp-physmach/gubaidulin/fbii_pyht_tracking/Results/n_mp={0:.1e},n_mp_ions={1:.1e},n_gaps={2:.1e}/'.format(
-        n_macroparticles,
-        n_macroparticles_ions, 
-        n_gaps
-    )
+def run(n_macroparticles, n_macroparticles_ions, n_gaps=0, n_segments=50, gap_every_104=False, interaction_model='weak', interaction_model_ions='strong'):
     if gap_every_104:
-        folder = '/work/sources/grp-physmach/gubaidulin/fbii_pyht_tracking/Results/n_mp={0:.1e},n_mp_ions={1:.1e},n_gaps={2:.1e}/_every_104'.format(
+        folder = '/lustre/scratch/sources/physmach/gubaidulin/fbii_pyht_tracking/Results/TDR/n_mp={0:.1e},n_mp_ions={1:.1e},n_gaps={2:.1e},n_segments={3:.1e}_every_104,int_model={4:}/'.format(
         n_macroparticles,
         n_macroparticles_ions, 
-        n_gaps
+        n_gaps,
+        n_segments,
+        interaction_model_ions
     )
+    else:
+        folder = '/lustre/scratch/sources/physmach/gubaidulin/fbii_pyht_tracking/Results/TDR/n_mp={0:.1e},n_mp_ions={1:.1e},n_gaps={2:.1e},n_segments={3:.1e},int_model={4:}/'.format(
+            n_macroparticles,
+            n_macroparticles_ions, 
+            n_gaps,
+            n_segments,
+            interaction_model_ions
+        )
     os.system('mkdir -p {:}'.format(folder))
     np.random.seed(42)
     print('Run with electron bunch macroparticle number equal to {:.1e}'.format(
@@ -130,7 +135,10 @@ def run(n_macroparticles, n_macroparticles_ions, n_gaps=0, n_segments=50, gap_ev
                                                 set_aperture=True,
                                                 n_segments=n_segments,
                                                 n_macroparticles_max = n_macroparticles_ions,
-                                                n_steps=int(H_RF*N_TURNS)))
+                                                n_steps=int(H_RF*N_TURNS),
+                                                interaction_model=interaction_model, 
+                                                interaction_model_ions=interaction_model_ions)
+                                                )
     trans_one_turn = [item for sublist in zip(trans_one_turn, beam_ion_elements) for item in sublist]
     for turn in tqdm(range(N_TURNS)):
         for index, m_ in enumerate((trans_one_turn)):
@@ -146,5 +154,5 @@ if __name__ == "__main__":
     slurm_array_task_id = int(sys.argv[1])
     n_macroparticles = np.array(
         [int(1e3), int(5e3), int(1e4), int(5e4)])
-    run(n_macroparticles[slurm_array_task_id], n_macroparticles_ions=int(1e4), n_gaps=0, n_segments=N_SEGMENTS)
+    run(n_macroparticles[slurm_array_task_id], n_macroparticles_ions=int(1e4), n_gaps=50, n_segments=N_SEGMENTS)
     sys.exit()

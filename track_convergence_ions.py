@@ -12,7 +12,7 @@ from PyHEADTAIL.particles import generators, particles
 import os, sys
 from weak_strong_ions import run
 
-os.system('export PYTHONPATH=/home/sources/physmach/gubaidulin/PyHEADTAIL/')
+os.system('export PYTHONPATH=/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/')
 os.system('echo ${PYTHONPATH}')
 N_TURNS = int(100)
 H_RF = 416
@@ -22,7 +22,7 @@ PHI_RF = 0
 if __name__ == "__main__":
     slurm_array_task_id = int(sys.argv[1])
     n_macroparticles = int(5e3)
-    n_gaps = 0
+    n_gaps = 50
     n_macroparticles_ions = np.array([1e3, 5e3, 1e4, 2e4, 3e4, 4e4, 5e4, 1e5])
     run(n_macroparticles = n_macroparticles,
         n_macroparticles_ions=n_macroparticles_ions[slurm_array_task_id],
