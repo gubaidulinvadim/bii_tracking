@@ -11,8 +11,8 @@
 #SBATCH --output=/home/sources/physmach/gubaidulin/out/job%J.out
 
 module load tools/python/anaconda3
-export PYTHONPATH='/home/sources/physmach/gubaidulin/PyHEADTAIL/'
-export PYTHONPATH=${PYTHONPATH}:'/home/sources/physmach/gubaidulin/'
+export PYTHONPATH='/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/'
+export PYTHONPATH=${PYTHONPATH}:'/lustre/scratch/sources/physmach/gubaidulin/'
 
-FILE='/home/sources/physmach/gubaidulin/fbii_pyht_tracking/weak_strong_ions.py'
+FILE='/lustre/scratch/sources/physmach/gubaidulin/fbii_pyht_tracking/weak_strong_ions.py'
 python ${FILE} ${SLURM_ARRAY_TASK_ID}
