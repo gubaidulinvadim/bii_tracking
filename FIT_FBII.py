@@ -80,7 +80,7 @@ def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
 def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
                  until=None, start_from_0=False, min_points=3,
                  min_n_risetimes=1.5, matplotlib_axis=None):
-    '''Fit the exponential rise time of a positive signal.'''
+    '''Fit the quasiexponential rise time of a positive signal.'''
     if start_from_0:
         start = 0
     else:

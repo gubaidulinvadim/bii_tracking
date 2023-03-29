@@ -9,12 +9,16 @@ from PyHEADTAIL.trackers.transverse_tracking import TransverseMap
 from PyHEADTAIL.trackers.longitudinal_tracking import RFSystems
 from PyHEADTAIL.general.printers import SilentPrinter
 from PyHEADTAIL.particles import generators, particles
-import os, sys
+import os
+import sys
 from weak_strong_ions import run
 
 os.system('export PYTHONPATH=/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/')
 os.system('echo ${PYTHONPATH}')
 N_TURNS = int(500)
+# os.system('export PYTHONPATH=/home/sources/physmach/gubaidulin/PyHEADTAIL/')
+# os.system('echo ${PYTHONPATH}')
+N_TURNS = int(100)
 H_RF = 416
 N_SEGMENTS = int(25)
 PHI_RF = 0
