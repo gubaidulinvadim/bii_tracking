@@ -9,4 +9,6 @@
 *checkpoint*
 Dockerfile
 *.npy
-.ipynb_checkpoints/*-checkpoint.ipynb
+*checkpoint.ipynb
+*runSimulation*
+submission_gaps*
