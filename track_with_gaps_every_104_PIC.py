@@ -22,6 +22,6 @@ PHI_RF = 0
 if __name__ == "__main__":
     slurm_array_task_id = int(sys.argv[1])
     n_macroparticles = int(1e3)
-    n_gaps = np.array([1, 2, 3, 10])
-    run(n_macroparticles, n_macroparticles_ions=int(1e5), n_gaps=n_gaps[slurm_array_task_id], n_segments=N_SEGMENTS, gap_every_104=True, interaction_model_ions='PIC')
+    gap_length = np.array([1, 2, 3, 10])
+    run(n_macroparticles, n_macroparticles_ions=int(1e5), gap_length=gap_length[slurm_array_task_id], n_segments=N_SEGMENTS, gap_every_104=True, interaction_model_ions='PIC')
     sys.exit()
