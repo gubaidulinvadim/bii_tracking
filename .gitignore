@@ -9,3 +9,4 @@
 *checkpoint*
 Dockerfile
 *.npy
+.ipynb_checkpoints/*-checkpoint.ipynb
