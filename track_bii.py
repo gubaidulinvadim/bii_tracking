@@ -43,9 +43,8 @@ def run(n_macroparticles, n_macroparticles_ions, gap_length=1, n_turns=int(2000)
     Returns:
         int: The value 0.
     """
-    folder = FOLDER_PATH+'Results/TDR/n_mp={0:.1e},n_mp_ions={1:.1e},gap_length={2:.1e},n_gaps={6:},n_segments={3:.1e},int_model={4:},smooth={5:}/'.format(
+    folder = FOLDER_PATH+'Results/TDR/n_mp={0:.1e},gap_length={1:},n_gaps={5:},n_segments={2:},int_model={3:},smooth={4:}/'.format(
         n_macroparticles,
-        n_macroparticles_ions,
         gap_length,
         n_segments,
         interaction_model_ions,
@@ -144,32 +143,23 @@ def run(n_macroparticles, n_macroparticles_ions, gap_length=1, n_turns=int(2000)
     else:
         try:
             print('lattice function sampling')
-            s_0 = np.load(FOLDER_PATH+'lattice_functions/s.npy')
-            beta_x_0 = np.load(FOLDER_PATH+'lattice_functions/beta_x.npy')
-            beta_y_0 = np.load(FOLDER_PATH+'lattice_functions/beta_y.npy')
-            alpha_x_0 = np.load(FOLDER_PATH+'lattice_functions/alpha_x.npy')
-            alpha_y_0 = np.load(FOLDER_PATH+'lattice_functions/alpha_y.npy')
-            eta_x_0 = np.load(FOLDER_PATH+'lattice_functions/eta_x.npy')
-            eta_y_0 = np.load(FOLDER_PATH+'lattice_functions/eta_y.npy')
-            beta_x = []
-            beta_y = []
-            alpha_x = []
-            alpha_y = []
-            eta_x = []
-            eta_y = []
-            s = []
-            for a in range(n_segments):
-                index = int(a*len(s)/n_segments)
-                s.append(s_0[index])
-                beta_x.append(beta_x_0[index])
-                beta_y.append(beta_y_0[index])
-                alpha_x.append(alpha_x_0[index])
-                alpha_y.append(alpha_y_0[index])
-                eta_x.append(eta_x_0[index])
-                eta_y.append(eta_y_0[index])
+            data_files = ['s', 'beta_x', 'beta_y',
+                          'alpha_x', 'alpha_y', 'eta_x', 'eta_y']
+            data = {}
+            for file in data_files:
+                data[file] = np.load('lattice_functions/' + file + '.npy')
+
+            s = data['s'][::len(data['s']) // n_segments]
+            beta_x = data['beta_x'][::len(data['beta_x']) // n_segments]
+            beta_y = data['beta_y'][::len(data['beta_y']) // n_segments]
+            alpha_x = data['alpha_x'][::len(data['alpha_x']) // n_segments]
+            alpha_y = data['alpha_y'][::len(data['alpha_y']) // n_segments]
+            eta_x = data['eta_x'][::len(data['eta_x']) // n_segments]
+            eta_y = data['eta_y'][::len(data['eta_y']) // n_segments]
+
+            D_x, D_y = np.array(eta_x), np.array(eta_y)
             alpha_x, alpha_y = np.array(alpha_x), np.array(alpha_y)
             beta_x, beta_y = np.array(beta_x), np.array(beta_y)
-            D_x, D_y = np.array(eta_x),  np.array(eta_y)
         except:
             raise RunTimeError(
                 'There is some error with your lattice functions. Check names and sampling. The number of points in the files should be larger than number of segments in the code.')
@@ -221,5 +211,5 @@ if __name__ == "__main__":
     parser = get_parser_for_bii()
     args = parser.parse_args()
     run(args.n_macroparticles, n_macroparticles_ions=int(1e6), gap_length=args.gap_length,
-        n_gaps=args.n_gaps, n_segments=args.n_segments, smooth=args.is_smooth, h_rf=args.h_rf)
+        n_gaps=args.n_gaps, n_segments=args.n_segments, smooth=args.is_smooth, h_rf=args.h_rf, interaction_model_ions=args.interaction_model_ions)
     sys.exit()
