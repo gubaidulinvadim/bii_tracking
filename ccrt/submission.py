@@ -5,7 +5,7 @@ IMAGE_NAME = 'pycomplete'
 SCRIPT_NAME = 'fbii_pyht_tracking/track_bii.py'
 
 
-def write_tmp_submission_script(job_name, is_smooth, gap_length, n_gaps, interaction_model_ions):
+def write_tmp_submission_script_ccrt(job_name, is_smooth, gap_length, n_gaps, interaction_model_ions):
     with open(job_name, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#MSUB -m work,scratch\n")
@@ -29,22 +29,26 @@ def write_tmp_submission_script(job_name, is_smooth, gap_length, n_gaps, interac
                                                                                                                                                                    interaction_model_ions))
 
 
+def write_submission_script_slurm():
+    pass
+
+
 if __name__ == '__main__':
     parser = get_parser_for_bii()
-    parser.add_argument('--job_name', action='store', metavar='JOB_NAME', type=str,
-                        help='Name of the job and associated .our and .err files')
+    parser.add_argument('--job_name', action='store', metavar='JOB_NAME', type=str, default='job',
+                        help='Name of the job and associated .our and .err files. Defaults to "job"')
     parser.add_argument('--sub_mode', action='store', metavar='SUB_MODE', type=str, default='ccrt',
-                        help='Submission mode. Accepted values are ["local", "ccrt", "slurm"]')
+                        help='Submission mode. Accepted values are ["local", "ccrt", "slurm"], defaults to "ccrt"')
     args = parser.parse_args()
     if args.sub_mode == 'ccrt':
-        write_tmp_submission_script(args.job_name,
-                                    args.is_smooth,
-                                    args.gap_length,
-                                    args.n_gaps,
-                                    args.interaction_model_ions)
+        write_tmp_submission_script_ccrt(args.job_name,
+                                         args.is_smooth,
+                                         args.gap_length,
+                                         args.n_gaps,
+                                         args.interaction_model_ions)
     elif args.sub_mode == 'slurm':
         pass
     elif args.sub_mode == 'local':
         pass
-    os.system('ccc_msub tmp_submission_script.sh')
-    os.system('rm -rf tmp_submission_script.sh')
+    os.system('ccc_msub {:}'.format(args.job_name))
+    os.system('rm -rf {:}'.format(args.job_name))
