@@ -18,7 +18,6 @@ import sys
 #os.system('export PYTHONPATH=/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/')
 #os.system('echo ${PYTHONPATH}')
 # Main parameters for the simulation
-N_SEGMENTS = int(50)  # number of segments used for transverse tracking
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 # path of the folder where to store the simulation results/data and some of the input
 FOLDER_PATH = '/home/dockeruser/fbii_pyht_tracking/'
@@ -26,7 +25,16 @@ FOLDER_PATH = '/home/dockeruser/fbii_pyht_tracking/'
 # FOLDER_PATH = '/home/gubaidulin/scripts/tracking/example_for_siwei/'
 
 
-def run(n_macroparticles, n_macroparticles_ions, gap_length=1, n_turns=int(2000), n_segments=50, n_gaps=4, h_rf=416, interaction_model='weak', interaction_model_ions='strong', smooth=True):
+def run(n_macroparticles,
+        n_macroparticles_ions,
+        gap_length=1,
+        n_turns=int(2000),
+        n_segments=50,
+        n_gaps=4,
+        h_rf=416,
+        interaction_model='weak',
+        interaction_model_ions='weak',
+        smooth=True):
     """
     Run the simulation with the specified parameters.
 
