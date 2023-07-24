@@ -10,9 +10,10 @@ def write_tmp_submission_script_ccrt(job_name, is_smooth, gap_length, n_gaps, in
         f.write("#!/bin/bash\n")
         f.write("#MSUB -m work,scratch\n")
         f.write("#MSUB -q milan\n")
+        f.write("#MSUB -Q long\n")
         f.write("#MSUB -n 1\n")
-        f.write("#MSUB -c 8\n")
-        f.write("#MSUB -T 72000\n")
+        f.write("#MSUB -c 16\n")
+        f.write("#MSUB -T 150000\n")
         f.write("#MSUB -A soleil\n")
         f.write("#MSUB -@ gubaidulinvadim@gmail.com:begin,end,requeue\n")
         f.write(
