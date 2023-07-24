@@ -1,11 +1,11 @@
 import os
 from utils import get_parser_for_bii
-MOUNT_FOLDER = '/ccc/work/cont003/soleil/gubaiduv/fbii_pyht_tracking:/home/dockeruser/fbii_pyht_tracking'
-IMAGE_NAME = 'pycomplete'
-SCRIPT_NAME = 'fbii_pyht_tracking/track_bii.py'
 
 
 def write_tmp_submission_script_ccrt(job_name, is_smooth, gap_length, n_gaps, interaction_model_ions):
+    MOUNT_FOLDER = '/ccc/work/cont003/soleil/gubaiduv/fbii_pyht_tracking:/home/dockeruser/fbii_pyht_tracking'
+    IMAGE_NAME = 'pycomplete'
+    SCRIPT_NAME = 'fbii_pyht_tracking/track_bii.py'
     with open(job_name, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#MSUB -m work,scratch\n")
@@ -30,8 +30,29 @@ def write_tmp_submission_script_ccrt(job_name, is_smooth, gap_length, n_gaps, in
                                                                                                                                                                    interaction_model_ions))
 
 
-def write_submission_script_slurm():
-    pass
+def write_submission_script_slurm(job_name, is_smooth, gap_length, n_gaps, interaction_model_ions):
+    MOUNT_FOLDER = '/lustre/scratch/sources/physmach/gubaidulin/fbii_pyht_tracking:/home/dockeruser/fbii_pyht_tracking'
+    IMAGE_NAME = '/lustre/scratch/sources/physmach/gubaidulin/pycomplete.sif'
+    SCRIPT_NAME = '/home/dockeruser/fbii_pyht_tracking/track_bii.py'
+    with open(job_name, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("#SBATCH --partition sumo\n")
+        f.write("#SBATCH -n 8\n")
+        f.write("#SBATCH --time={:}\n".format(job_time))
+        f.write('#SBATCH --export=ALL\n')
+        f.write("#SBATCH --mail-user='gubaidulinvadim@gmail.com'\n")
+        f.write('#SBATCH --mail-type=begin,end,requeue\n')
+        f.write(
+            "#SBATCH --error=/home/sources/physmach/gubaidulin/err/{0:}_%I.err\n".format(job_name))
+        f.write(
+            "singularity exec --no-home --B {0:} {1:} python {2:} --is_smooth {3:} --gap_length {4:} --n_gaps {5:} --interaction_model_ions {6:}\n".format(MOUNT_FOLDER,
+                                                                                                                                                           IMAGE_NAME,
+                                                                                                                                                           SCRIPT_NAME,
+                                                                                                                                                           is_smooth,
+                                                                                                                                                           gap_length,
+                                                                                                                                                           n_gaps,
+                                                                                                                                                           interaction_model_ions))
+    return job_name
 
 
 if __name__ == '__main__':
@@ -47,9 +68,14 @@ if __name__ == '__main__':
                                          args.gap_length,
                                          args.n_gaps,
                                          args.interaction_model_ions)
+        os.system('ccc_msub {:}'.format(args.job_name))
     elif args.sub_mode == 'slurm':
-        pass
+        write_tmp_submission_script_ccrt(args.job_name,
+                                         args.is_smooth,
+                                         args.gap_length,
+                                         args.n_gaps,
+                                         args.interaction_model_ions)
+        os.system('sbatch {:}'.format(args.job_name))
     elif args.sub_mode == 'local':
         pass
-    os.system('ccc_msub {:}'.format(args.job_name))
     os.system('rm -rf {:}'.format(args.job_name))
