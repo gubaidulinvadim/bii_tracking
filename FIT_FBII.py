@@ -67,16 +67,14 @@ def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
             min_points += 1
 
     if matplotlib_axis:
-        matplotlib_axis.plot(signal[:int(t[until] + start)])
+        # matplotlib_axis.plot(, signal[:int(t[until] + start)])
         tplot = np.linspace(t[fit_start], t[until], 100)
-        matplotlib_axis.plot(start + tplot,
+        matplotlib_axis.plot((start + tplot),
                              np.exp(amplitude + exponent * tplot),
                              color='black', ls='--')
-        matplotlib_axis.axvline(start + t[fit_start], 0, 1, color='red')
-        matplotlib_axis.axvline(start + t[until], 0, 1, color='red')
-        matplotlib_axis.set_title(1 / exponent)
-
-    return 1 / exponent
+        matplotlib_axis.axvline((start + t[fit_start]), 0, 1, color='red')
+        matplotlib_axis.axvline((start + t[until]), 0, 1, color='red')
+    return 1 / exponent, amplitude, start, fit_start, until
 def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
                  until=None, start_from_0=False, min_points=3,
                  min_n_risetimes=1.5, matplotlib_axis=None):
