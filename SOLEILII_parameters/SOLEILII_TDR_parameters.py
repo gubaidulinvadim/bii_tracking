@@ -1,6 +1,5 @@
 from scipy.constants import physical_constants, c, e, m_e, m_p, epsilon_0, pi, N_A, R
-from numpy import sqrt
-
+from numpy import sqrt, cos, arcsin
 r_e = physical_constants["classical electron radius"][0]
 m_u = physical_constants["unified atomic mass unit"][0]
 r_u = 1/(4*pi*epsilon_0)*e**2/(m_u*c**2)
@@ -8,6 +7,7 @@ r_u = 1/(4*pi*epsilon_0)*e**2/(m_u*c**2)
 CIRCUMFERENCE = 353.74
 R = CIRCUMFERENCE/(2*pi)
 ENERGY = 2.75e9
+ENERGY_LOSS_PER_TURN = None
 GAMMA = 1 + ENERGY * e / (m_e * c**2)
 BETA = sqrt(1 - GAMMA**-2)
 OMEGA_REV = 2*pi*BETA*c/CIRCUMFERENCE
@@ -18,11 +18,12 @@ SIGMA_Z = 2.7e-3
 H_RF = 416
 F_RF = 352.56e9
 U_LOSS = 490e3
-V_RF = 1.38e6
-ALPHA_0 = 9.1e-5
+V_RF = 1.8e6
+# ALPHA_0 = 9.1e-5
+ALPHA_0 = 1.07e-4
 GAMMA_T = 1. / sqrt(ALPHA_0)
 F_S = 1.4e3
-Q_S = 2*pi*F_S/OMEGA_REV
+Q_S = sqrt(ALPHA_0*H_RF*V_RF*cos(arcsin(U_LOSS/V_RF))/(2*pi*BETA**2*ENERGY))
 TAU_X = 7.3e-3
 TAU_Y = 13.1e-3
 TAU_Z = 11.7e-3
@@ -31,8 +32,8 @@ Q_Y = 18.3
 Qp_X = 1.6
 Qp_Y = 1.6
 PRESSURE = 1e-7
-BETA_X_SMOOTH = 5.58  
-BETA_Y_SMOOTH = 3.92 
+BETA_X_SMOOTH = 5.58  # R/Q_X
+BETA_Y_SMOOTH = 3.92  # R/Q_Y
 ALPHA_X_SMOOTH = 0
 ALPHA_Y_SMOOTH = 0
 I = 500e-3
