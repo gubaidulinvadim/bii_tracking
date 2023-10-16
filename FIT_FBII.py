@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_envelope(x, y, window_size=256):
     '''Return rolling maximum of signal y along time x.'''
     xm = np.zeros(len(x) // window_size)
@@ -8,12 +9,13 @@ def get_envelope(x, y, window_size=256):
         xm[i // window_size] = i + np.argmax(y[i:i+window_size])
         ym[i // window_size] = np.max(y[i:i+window_size])
     xm = np.trim_zeros(xm, trim='b')
-    ym = np.trim_zeros(ym, trim='b')    
+    ym = np.trim_zeros(ym, trim='b')
     return xm, ym
 
+
 def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
-                 until=None, start_from_0=False, min_points=3,
-                 min_n_risetimes=1.5, matplotlib_axis=None):
+                             until=None, start_from_0=False, min_points=3,
+                             min_n_risetimes=1.5, matplotlib_axis=None):
     '''Fit the exponential rise time of a positive signal.'''
     if start_from_0:
         start = 0
@@ -31,7 +33,7 @@ def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
     until = len(x)
     exponent = 0
     while exponent < min_n_risetimes / t[until-1]:
-    # extend fitting region until covers at least min_n_risetimes rise times
+        # extend fitting region until covers at least min_n_risetimes rise times
         if start_from_0:
             fit_start = 0
         else:
@@ -46,7 +48,7 @@ def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
             #     (np.arange(len(ddt)-2) > fit_start + min_points)
             # )[0][0]
             until_from_curvature = np.where(
-                (dddt[:-2] < 0)& (dddt[1:-1] < 0) & (dddt[2:] < 0) &
+                (dddt[:-2] < 0) & (dddt[1:-1] < 0) & (dddt[2:] < 0) &
                 (np.arange(len(dddt)-2) > fit_start + min_points)
             )[0][0]
             # until = min(until, until_from_curvature)
@@ -75,9 +77,11 @@ def fit_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
         matplotlib_axis.axvline((start + t[fit_start]), 0, 1, color='red')
         matplotlib_axis.axvline((start + t[until]), 0, 1, color='red')
     return 1 / exponent, amplitude, start, fit_start, until
+
+
 def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e-5,
-                 until=None, start_from_0=False, min_points=3,
-                 min_n_risetimes=1.5, matplotlib_axis=None):
+                                  until=None, start_from_0=False, min_points=3,
+                                  min_n_risetimes=1.5, matplotlib_axis=None):
     '''Fit the quasiexponential rise time of a positive signal.'''
     if start_from_0:
         start = 0
@@ -95,7 +99,7 @@ def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e
     until = len(x)
     exponent = 0
     while exponent < min_n_risetimes / t[until-1]:
-    # extend fitting region until covers at least min_n_risetimes rise times
+        # extend fitting region until covers at least min_n_risetimes rise times
         if start_from_0:
             fit_start = 0
         else:
@@ -109,7 +113,7 @@ def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e
             #     (np.arange(len(ddt)-2) > fit_start + min_points)
             # )[0][0]
             until_from_curvature = np.where(
-                (dddt[:-2] < 0)& (dddt[1:-1] < 0) & (dddt[2:] < 0) &
+                (dddt[:-2] < 0) & (dddt[1:-1] < 0) & (dddt[2:] < 0) &
                 (np.arange(len(dddt)-2) > fit_start + min_points)
             )[0][0]
             # until = min(until, until_from_curvature)
@@ -139,4 +143,5 @@ def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e
         matplotlib_axis.axvline(start + t[until], 0, 1, color='red')
         matplotlib_axis.set_title(1 / exponent)
 
-    return 1 / exponent
+
+where
