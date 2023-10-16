@@ -144,4 +144,3 @@ def fit_sqrt_exponential_risetime(signal, smoothing_window_size=50, min_level=8e
         matplotlib_axis.set_title(1 / exponent)
 
 
-where
