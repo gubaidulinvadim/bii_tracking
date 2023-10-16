@@ -3,17 +3,21 @@ import numpy as np
 from scipy.constants import pi, c
 ###
 
+
 @np.vectorize
-def f_ions(n, omega_I, n_empty=1, L_sep = 0.85, n_gaps=1, h_rf = 416, N_ions=30, approximation='exp'):
+def f_ions(n, omega_I, n_empty=1, L_sep=0.85, n_gaps=1, h_rf=416, N_ions=30, approximation='exp'):
     k = np.linspace(0, n-1, n, dtype=np.int64)
     if approximation == "arctan":
-        f = N_ions*(h_rf//n_gaps-n_empty)*np.sum((2/pi*np.arctan((omega_I*n_empty*L_sep/(2*c))**-1))**k)
+        f = N_ions*(h_rf//n_gaps-n_empty) * \
+            np.sum((2/pi*np.arctan((omega_I*n_empty*L_sep/(2*c))**-1))**k)
     elif approximation == 'exp':
         L_diff = c/(omega_I/(2*pi))
-        f = N_ions*(h_rf//n_gaps-n_empty)*np.sum(np.exp(-k*n_empty*L_sep/L_diff))
+        f = N_ions*(h_rf//n_gaps-n_empty) * \
+            np.sum(np.exp(-k*n_empty*L_sep/L_diff))
     else:
-        f=0
+        f = 0
     return f
+
 
 def get_parser_for_bii():
     parser = argparse.ArgumentParser(
@@ -46,4 +50,8 @@ def get_parser_for_bii():
                         help='Average residual gas density. Defaults to 2.4e13.')
     parser.add_argument('--beam_current', action='store', metavar='BEAM_CURRENT',
                         type=float, default=500e-3, help='Total beam current. Defaults to 500 mA.')
+    parser.add_argument('--ion_mass', action='store', metavar='A', type=int, default=28,
+                        help='Ion molecular mass in a.u.')
+    parser.add_argument('--sigma_i', action='store', metavar='SIMGA_I', type=float, default=1.78e-22,
+                        help='Ionisation cross-section in m^2.')
     return parser
