@@ -1,9 +1,12 @@
 
 import h5py as hp
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-def plot_ion_density(ax, n_ion_macroparticles, n_segments, h_rf=416, n_macroions=30, n_g = 2.4e13, Sigma_I = 1.22e-22, circumference=354, **mpl_kwargs):
+from .simulation import utils
+
+
+def plot_ion_density(ax, n_ion_macroparticles, n_segments, h_rf=416, n_macroions=30, n_g = 3.2e12, Sigma_I = 1.78e-22, circumference=354, **mpl_kwargs):
     data_length = n_ion_macroparticles.shape[0]
     n_ions_per_bunch = n_g*Sigma_I*circumference/n_segments/n_macroions
     n_bunches_passed = np.linspace(0, data_length/h_rf, int(data_length))

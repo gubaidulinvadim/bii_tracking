@@ -1,7 +1,9 @@
 import argparse
+
 import numpy as np
-from scipy.constants import pi, c
+from scipy.constants import c, pi
 ###
+from scipy.optimize import curve_fit
 
 
 @np.vectorize
@@ -26,19 +28,25 @@ def get_parser_for_bii():
         "V. Gubaidulin, A. Gamelin, and R. Nagaoka, 'Beam-ion Instabilities and Their Mitigation for SOLEIL II', Proc. of IPAC'23, Venice, Italy, 2023, paper WEPA004.\n" +
         "Oeftiger, A. (2019). An Overview of PyHEADTAIL, Tech. rep. CERN-ACC-NOTE-2019-0013. https://cds.cern.ch/record/2672381\n")
     parser.add_argument('--n_macroparticles', action='store', metavar='N_MACRO', type=int,
-                        default=int(5e3), help='Number of electron macroparticles in a bunch')
+                        default=int(5e3), help='Number of electron macroparticles in a bunch. ' +
+                        'Defaults to 5000.')
     parser.add_argument('--gap_length', action='store', metavar='GAP_LENGTH', type=int,
-                        default=1, help='Gap length as a multiple of rf bucket length')
+                        default=1, help='Gap length as a multiple of rf bucket length. ' +
+                        'Defaults to 1.')
     parser.add_argument('--n_gaps', action='store', metavar='N_GAPS', type=int,
-                        default=4, help='Number of gaps symmetrically distributed along the ring')
+                        default=4, help='Number of gaps symmetrically distributed along the ring. ' +
+                        'Integer above 0. Defaults to 4.')
     parser.add_argument('--is_smooth', action='store', type=str,
-                        default='True', help='A flag for smooth focusing approximation')
+                        default='True', help='A flag for smooth focusing approximation. Defaults to "True".')
     parser.add_argument('--n_segments', action='store', metavar='N_SEGMENTS', type=int, default=25,
-                        help='Number of segments used for transverse tracking (same as the number of ion elements)')
+                        help='Number of segments used for transverse tracking (same as the number of ion elements). ' +
+                        'Defaults to 25.')
     parser.add_argument('--h_rf', action='store', metavar='H_RF', type=int, default=416,
-                        help='rf harmonic, number of bunches without gaps is hardcoded such that every rf bucket is filled')
-    parser.add_argument('--interaction_model_ions', action='store', metavar='INT_MODEL', type=str, default='weak',
-                        help='Interaction model used to compute the effect of ion electromagnetic field on electrons. The following values are allowed ["strong", "weak", "PIC"]')
+                        help='rf harmonic, number of bunches without gaps is hardcoded such that every rf bucket is filled.')
+    parser.add_argument('--interaction_model_ions', action='store', metavar='INT_MODEL', type=str, default='strong',
+                        help='Interaction model used to compute the effect of ion electromagnetic field on electrons.' +
+                        ' The following values are allowed ["strong", "weak", "PIC"].' +
+                        ' Defaults to "strong".')
     parser.add_argument('--charge_variation', action='store',
                         metavar='CHARGE_VARIATION', type=float, default=0,
                         help='Gaussian charge variation standard deviation in percents. 0 would mean no variation. Defaults to 0.')
@@ -46,12 +54,12 @@ def get_parser_for_bii():
                         metavar='PRESSURE_VARIATION', type=float, default=0,
                         help='Gaussian residual gas pressure variation standard deviation in percents. 0 would mean no variation. Defaults to 0.')
     parser.add_argument('--average_pressure', action='store',
-                        metavar='AVERAGE_PRESSURE', type=float, default=2.4e13,
-                        help='Average residual gas density. Defaults to 2.4e13.')
+                        metavar='AVERAGE_PRESSURE', type=float, default=3.2e12,
+                        help='Average residual gas density. Defaults to 3.2e12.')
     parser.add_argument('--beam_current', action='store', metavar='BEAM_CURRENT',
                         type=float, default=500e-3, help='Total beam current. Defaults to 500 mA.')
     parser.add_argument('--ion_mass', action='store', metavar='A', type=int, default=28,
-                        help='Ion molecular mass in a.u.')
-    parser.add_argument('--sigma_i', action='store', metavar='SIMGA_I', type=float, default=1.78e-22,
-                        help='Ionisation cross-section in m^2.')
+                        help='Ion molecular mass in a.u. Defaults to 28.')
+    parser.add_argument('--sigma_i', action='store', metavar='SIGMA_I', type=float, default=1.78e-22,
+                        help='Ionisation cross-section in m^2. Defaults to 1.78e-22.')
     return parser

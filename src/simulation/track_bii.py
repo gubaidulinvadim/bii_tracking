@@ -1,30 +1,26 @@
-import numpy as np
-# this defines the constants related to the accelerator used in the simulation
-from SOLEILII_parameters.SOLEILII_TDR_parameters import *
-from scipy.constants import m_p
-# from PyHEADTAIL.general.contextmanager import CPU, GPU
-from PyHEADTAIL.general import pmath as pm
-from PyHEADTAIL.ion_cloud.ion_cloud import BeamIonElement
-from PyHEADTAIL.monitors.monitors import BunchMonitor
-from PyHEADTAIL.trackers.transverse_tracking import TransverseMap
-from PyHEADTAIL.trackers.longitudinal_tracking import RFSystems
-from PyHEADTAIL.general.printers import SilentPrinter
-from PyHEADTAIL.particles import generators, particles
-import PyHEADTAIL
-from tqdm import tqdm
-from utils import get_parser_for_bii
-from scipy.interpolate import interp1d
 import os
 import sys
-#os.system('export PYTHONPATH=/lustre/scratch/sources/physmach/gubaidulin/PyHEADTAIL/')
-#os.system('echo ${PYTHONPATH}')
+
+import numpy as np
+import PyHEADTAIL
+from PyHEADTAIL.general import pmath as pm
+from PyHEADTAIL.general.printers import SilentPrinter
+from PyHEADTAIL.ion_cloud.ion_cloud import BeamIonElement
+from PyHEADTAIL.monitors.monitors import BunchMonitor
+from PyHEADTAIL.particles import generators, particles
+from PyHEADTAIL.trackers.longitudinal_tracking import RFSystems
+from PyHEADTAIL.trackers.transverse_tracking import TransverseMap
+from scipy.constants import m_p
+from scipy.interpolate import interp1d
+# this defines the constants related to the accelerator used in the simulation
+from SOLEILII_parameters.SOLEILII_TDR_parameters import *
+from tqdm import tqdm
+from utils import get_parser_for_bii
+
 # Main parameters for the simulation
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 # path of the folder where to store the simulation results/data and some of the input
-FOLDER_PATH = '/home/dockeruser/fbii_pyht_tracking/'
-# FOLDER_PATH = '/home/gubaidulin/scripts/tracking/fbii_pyht_tracking/'
-# path of the folder where to store the simulation results/data and some of the input
-# FOLDER_PATH = '/home/gubaidulin/scripts/tracking/example_for_siwei/'
+FOLDER_PATH = '/home/dockeruser/bii_pyht_tracking/'
 
 
 def run(n_macroparticles,
@@ -63,7 +59,8 @@ def run(n_macroparticles,
         interaction_model = 'PIC'
     else:
         interaction_model = 'weak'
-    folder = FOLDER_PATH+'Results/TDR/n_mp={0:.1e},gap_length={1:},n_gaps={5:},n_segments={2:},int_model={3:},smooth={4:},charge_variation={6:},pressure_variation={7:},pressure={8:.1e},beam_current={9:.1e}/'.format(
+
+    folder = FOLDER_PATH+'Results/TDR/n_mp={0:.1e},gap_length={1:},n_gaps={5:},n_segments={2:},int_model={3:},smooth={4:},charge_variation={6:},pressure_variation={7:},pressure={8:.1e},beam_current={9:.1e},A={10:}/'.format(
         n_macroparticles,
         gap_length,
         n_segments,
@@ -73,7 +70,8 @@ def run(n_macroparticles,
         charge_variation,
         pressure_variation,
         average_pressure,
-        beam_current
+        beam_current,
+        ion_mass
     )
     os.makedirs(folder, exist_ok=True)
     np.random.seed(42)
@@ -81,9 +79,6 @@ def run(n_macroparticles,
         n_macroparticles))
     print('Run with ion cloud max macroparticle number equal to {:.1e}'.format(
         n_macroparticles_ions))
-    # PHI_RF = np.arccos(U_LOSS/V_RF) if (GAMMA**-2-GAMMA_T**-
-
-    # 2) < 0 else pi+np.arccos(U_LOSS/V_RF)
     long_map = RFSystems(
         CIRCUMFERENCE,
         [h_rf],
@@ -112,8 +107,8 @@ def run(n_macroparticles,
     intensity_per_bunch = bunch_current/e*2*pi/OMEGA_REV
     for ind, h in enumerate(range(h_rf)):
         np.random.seed(42)
-        electron_bunch = generators.ParticleGenerator(macroparticlenumber=n_macroparticles,
-                                                      intensity=intensity_per_bunch,
+        electron_bunch = generators.ParticleGenerator(macroparticlenumber=n_macroparticles//2,
+                                                      intensity=intensity_per_bunch//2,
                                                       charge=e, gamma=GAMMA, mass=m_e,
                                                       circumference=CIRCUMFERENCE,
                                                       # distribution_x=generators.kv2D(r_x, r_xp),
@@ -129,23 +124,23 @@ def run(n_macroparticles,
                                                           SIGMA_Z, SIGMA_DP),
                                                       printer=SilentPrinter()
                                                       ).generate()
-#        electron_bunch_twin = particles.Particles(macroparticlenumber=n_macroparticles//2,
-#                                                  particlenumber_per_mp=intensity_per_bunch/n_macroparticles,
-#                                                  charge=e, gamma=GAMMA, mass=m_e,
-#                                                  circumference=CIRCUMFERENCE,
-#                                                  coords_n_momenta_dict={
-#                                                    'x': -electron_bunch.x,
-#                                                    'xp': -electron_bunch.xp,
-#                                                    'y': -electron_bunch.y,
-#                                                    'yp': -electron_bunch.yp,
-#                                                   'z': -electron_bunch.z,
-#                                                    'dp': -electron_bunch.dp
-#                                                  },
-#                                                  printer=SilentPrinter()
-#                                     )
-#        electron_bunch += electron_bunch_twin
-#        np.random.seed(ind)
-#        electron_bunch.y += np.random.normal(scale=0.02*electron_bunch.sigma_y(), size=1)
+       electron_bunch_twin = particles.Particles(macroparticlenumber=n_macroparticles//2,
+                                                 particlenumber_per_mp=intensity_per_bunch/n_macroparticles,
+                                                 charge=e, gamma=GAMMA, mass=m_e,
+                                                 circumference=CIRCUMFERENCE,
+                                                 coords_n_momenta_dict={
+                                                   'x': -electron_bunch.x,
+                                                   'xp': -electron_bunch.xp,
+                                                   'y': -electron_bunch.y,
+                                                   'yp': -electron_bunch.yp,
+                                                  'z': -electron_bunch.z,
+                                                   'dp': -electron_bunch.dp
+                                                 },
+                                                 printer=SilentPrinter()
+                                    )
+       electron_bunch += electron_bunch_twin
+       np.random.seed(ind)
+       electron_bunch.y += np.random.normal(scale=0.02*electron_bunch.sigma_y(), size=1)
         if charge_variation != 0:
             np.random.seed(ind)
             electron_bunch.intensity = np.random.normal(
@@ -156,7 +151,7 @@ def run(n_macroparticles,
         electron_bunch.xp -= electron_bunch.mean_xp()
         electron_bunch.z += h*CIRCUMFERENCE/h_rf
         electron_bunch_list.append(electron_bunch)
-        filename = folder+'BM(n_bunch={0:})'.format(int(h))
+        filename = folder+'BM(n_bunch={0:03d})'.format(int(h))
         bunch_monitor = BunchMonitor(filename,
                                      n_steps=int(n_segments*n_turns),
                                      write_buffer_every=5000,
@@ -206,7 +201,7 @@ def run(n_macroparticles,
     trans_one_turn = [m for m in trans_map]
     BI = BeamIonElement()
     beam_ion_elements = []
-
+    beam_ion_elements2 = []
     # create beam_ion_elements for each segment of transverse map
     for ind, m in enumerate(trans_one_turn):
         # Uncomment to record 6D coordinates of every ion macroparticle in the first beam-ion element
@@ -221,7 +216,7 @@ def run(n_macroparticles,
         np.random.normal(ind)
         vacuum_pressure = np.random.normal(
             loc=average_pressure, scale=0.01*pressure_variation*average_pressure, size=1)
-        monitor_name = monitor_name = folder + \
+        monitor_name = folder + \
             'IM(ind={0:})'.format(int(ind)) if ind == 1 else None
         print('For ion elements with index {:} vacuum pressure is {:.1e}'.format(
             ind, vacuum_pressure[0]))
@@ -237,9 +232,20 @@ def run(n_macroparticles,
                                                 sigma_i=sigma_i,
                                                 A=ion_mass)
                                  )
-
+        beam_ion_elements2.append(BeamIonElement(dist_ions='GS',
+                                                monitor_name='CO2'+monitor_name,
+                                                set_aperture=True,
+                                                n_segments=n_segments,
+                                                n_macroparticles_max=n_macroparticles_ions,
+                                                n_steps=int(h_rf*n_turns),
+                                                interaction_model=interaction_model,
+                                                interaction_model_ions=interaction_model_ions,
+                                                n_g=2.9e12,
+                                                sigma_i=2.79e-22,
+                                                A=44)
+                                 )
     trans_one_turn = [item for sublist in zip(
-        trans_one_turn, beam_ion_elements) for item in sublist]
+        trans_one_turn, beam_ion_elements, beam_ion_elements2) for item in sublist]
 
     for turn in tqdm(range(n_turns)):
         for index, m_ in enumerate((trans_one_turn)):
