@@ -1,5 +1,6 @@
-from scipy.constants import physical_constants, c, e, m_e, m_p, epsilon_0, pi, N_A, R
 from numpy import sqrt
+from scipy.constants import (N_A, R, c, e, epsilon_0, m_e, m_p,
+                             physical_constants, pi)
 
 r_e = physical_constants["classical electron radius"][0]
 m_u = physical_constants["unified atomic mass unit"][0]

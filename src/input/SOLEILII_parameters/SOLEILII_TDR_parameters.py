@@ -1,5 +1,7 @@
-from scipy.constants import physical_constants, c, e, m_e, m_p, epsilon_0, pi, N_A, R
-from numpy import sqrt, cos, arcsin
+from numpy import arcsin, cos, sqrt
+from scipy.constants import (N_A, R, c, e, epsilon_0, m_e, m_p,
+                             physical_constants, pi)
+
 r_e = physical_constants["classical electron radius"][0]
 m_u = physical_constants["unified atomic mass unit"][0]
 r_u = 1/(4*pi*epsilon_0)*e**2/(m_u*c**2)

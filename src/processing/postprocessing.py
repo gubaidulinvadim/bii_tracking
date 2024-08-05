@@ -3,7 +3,7 @@ import h5py as hp
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .simulation import utils
+from ..simulation import utils
 
 
 def plot_ion_density(ax, n_ion_macroparticles, n_segments, h_rf=416, n_macroions=30, n_g = 3.2e12, Sigma_I = 1.78e-22, circumference=354, **mpl_kwargs):

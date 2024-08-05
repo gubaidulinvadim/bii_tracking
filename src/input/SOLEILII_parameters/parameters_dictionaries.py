@@ -1,6 +1,7 @@
-from scipy.constants import c, e
 import numpy as np
 from ions import get_omega_i
+from scipy.constants import c, e
+
 L_sep = 0.85
 # Colliders and oher
 # PEPII, KEKB, SuperKEKBI, SuperKEKBII, KEK ATF,EIC,
