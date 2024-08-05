@@ -17,3 +17,4 @@ submission_gaps*
 notebooks
 __pycache__
 *.yaml
+*.ipynb
