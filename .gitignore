@@ -11,6 +11,8 @@ Dockerfile
 *checkpoint.ipynb
 *runSimulation*
 submission_gaps*
+.ipynb.checkpoints/
+.vscode/
 *.ipynb.checkpoints
 notebooks
 __pycache__
