@@ -1,4 +1,3 @@
-#Ignore all hdf5 files
 *.hdf5
 *.h5
 *.h5part
@@ -12,3 +11,7 @@ Dockerfile
 *checkpoint.ipynb
 *runSimulation*
 submission_gaps*
+*.ipynb.checkpoints
+notebooks
+__pycache__
+*.yaml
