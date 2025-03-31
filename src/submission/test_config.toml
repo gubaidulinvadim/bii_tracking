@@ -1,0 +1,36 @@
+title = "A test configuration file. This aimed to test job submission with a configuration file."
+
+[environment]
+container = "soleil-pa:mbtrack2dev"
+mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/"]
+mount_destination = ["/home/dockeruser/bii_tracking/"] 
+server = "ccrt" 
+# Job setup
+[job]
+name = "collimation" 
+time = 600 
+n_cpu = 24 
+partition = "milan" 
+err_folder = "/ccc/work/cont003/soleil/gubaiduv/err/" 
+out_folder = "/ccc/work/cont003/soleil/gubaiduv/out/"
+[script]
+name = "/home/dockeruser/bii_tracking/simulation/track_bii.py"
+n_macroparticles = 100000
+n_turns = 5000
+gap_length = 1
+n_gaps = 4
+n_segments = 8
+smooth = false
+h_rf = 416
+ion_field_model = 'weak'
+electron_field_model = 'weak'
+charge_variation = 0
+pressure_variation = 0
+average_pressure = 2.9e12
+beam_current = 0.5
+sigma_i = 2.79e-22
+ion_mass = 44
+code = "mbtrack2"
+feedback_tau = 0
+
+
