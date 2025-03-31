@@ -3,17 +3,13 @@ pypath = os.getenv('PYTHONPATH')
 pypath = pypath + ':/home/dockeruser/machine_data'
 os.environ['PYTHONPATH']=pypath
 import sys
-from scipy.constants import m_p
-from scipy.interpolate import interp1d
-# this defines the constants related to the accelerator used in the simulation
-from tqdm import tqdm
 from utils import get_parser_for_bii
-
+import tomllib 
 # Main parameters for the simulation
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 # path of the folder where to store the simulation results/data and some of the input
-# FOLDER_PATH = '/home/dockeruser/bii_pyht_tracking/'
-FOLDER_PATH = '/home/gubaidulin/scripts/bii_tracking/'
+FOLDER_PATH = '/home/dockeruser/bii_tracking/'
+# FOLDER_PATH = '/home/gubaidulin/scripts/bii_tracking/'
 def run(n_macroparticles=int(5e3),
         gap_length=1,
         n_turns=int(3000),
@@ -56,22 +52,47 @@ def run(n_macroparticles=int(5e3),
 
 if __name__ == "__main__":
     parser = get_parser_for_bii()
+    parser.add_argument('--config_file', action='store', metavar='CONFIG_FILE',
+                        type=str, default='config.toml',
+                        help='Configuration file in the TOML format.')
     args = parser.parse_args()
-    run(n_macroparticles=args.n_macroparticles,
-        n_turns=args.n_turns,
-        gap_length=args.gap_length,
-        n_gaps=args.n_gaps,
-        n_segments=args.n_segments,
-        smooth=args.is_smooth,
-        h_rf=args.h_rf,
-        ion_field_model=args.ion_field_model,
-        electron_field_model=args.electron_field_model,
-        charge_variation=args.charge_variation,
-        pressure_variation=args.pressure_variation,
-        average_pressure=args.average_pressure,
-        beam_current=args.beam_current,
-        sigma_i=args.sigma_i,
-        ion_mass=args.ion_mass,
-        code=args.code,
-        feedback_tau=args.feedback_tau)
+    with open(args.config_file, 'rb') as f:
+        config = tomllib.load(f)['script']
+
+    # run(n_macroparticles=args.n_macroparticles,
+    #     n_turns=args.n_turns,
+    #     gap_length=args.gap_length,
+    #     n_gaps=args.n_gaps,
+    #     n_segments=args.n_segments,
+    #     smooth=args.is_smooth,
+    #     h_rf=args.h_rf,
+    #     ion_field_model=args.ion_field_model,
+    #     electron_field_model=args.electron_field_model,
+    #     charge_variation=args.charge_variation,
+    #     pressure_variation=args.pressure_variation,
+    #     average_pressure=args.average_pressure,
+    #     beam_current=args.beam_current,
+    #     sigma_i=args.sigma_i,
+    #     ion_mass=args.ion_mass,
+    #     code=args.code,
+    #     feedback_tau=args.feedback_tau)
+
+    run(n_macroparticles=config['n_macroparticles'],
+        n_turns=config['n_turns'],
+        gap_length=config['gap_length'],
+        n_gaps=config['n_gaps'],
+        n_segments=config['n_segments'],
+        smooth=config['is_smooth'],
+        h_rf=config['h_rf'],
+        ion_field_model=config['ion_field_model'],
+        electron_field_model=config['electron_field_model'],
+        charge_variation=config['charge_variation'],
+        pressure_variation=config['pressure_variation'],
+        average_pressure=config['average_pressure'],
+        beam_current=config['beam_current'],
+        sigma_i=config['sigma_i'],
+        ion_mass=config['ion_mass'],
+        code=config['code'],
+        feedback_tau=config['feedback_tau'])
+
     sys.exit()

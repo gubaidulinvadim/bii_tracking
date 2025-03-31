@@ -145,6 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('--is_gpu', action='store', metavar='IS_GPU', type=int, default=0,
                         help='GPU flag, integer value 0 or 1. Defaults to 0.')
     args = parser.parse_args()
+    # parser.add_argument('--config_file', action='store', metavar='CONFIG',
+    #                     type=str, default='', help='Name of the .toml configuration file.')
     write_tmp_submission_script(args.sub_mode,
                                 args.is_gpu,
                                 args.job_name,

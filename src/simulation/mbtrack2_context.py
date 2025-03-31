@@ -1,23 +1,19 @@
-import os
 import sys
 sys.path.append('../input')
 import numpy as np
-from mbtrack2 import (CircularResistiveWall, Electron, Synchrotron,
-                      WakePotential)
-from mbtrack2.tracking import (Beam, Bunch, LongitudinalMap, RFCavity,
-                               SynchrotronRadiation, TransverseMap)
-from mbtrack2.tracking.beam_ion_effects import BeamIonElement
-from mbtrack2.tracking.element import (TransverseMap, TransverseMapSector,
-                                       transverse_map_sector_generator)
+from mbtrack2 import (Electron, Synchrotron)
+from mbtrack2.tracking import (Beam, LongitudinalMap, RFCavity,
+                               SynchrotronRadiation)
+from mbtrack2.tracking.beam_ion_effects import BeamIonElement, IonAperture, IonMonitor
+from mbtrack2.tracking.element import (transverse_map_sector_generator)
 from mbtrack2.tracking.monitors import BeamMonitor
 from mbtrack2.tracking.feedback import ExponentialDamper, FIRDamper
-from mbtrack2.utilities import Optics
 from soleil import v2366_v2
 from scipy.constants import m_p
-from scipy.interpolate import interp1d
+# from scipy.interpolate import interp1d
 from SOLEILII_parameters.SOLEILII_TDR_parameters import *
 from tqdm import tqdm
-from utils import get_parser_for_bii
+# from utils import get_parser_for_bii
 
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 FOLDER_PATH = '/home/dockeruser/bii_tracking/'
@@ -79,7 +75,8 @@ def run(beam_current=500e-3,
                                                 n_segments,
                                                 h_rf,
                                                 smooth)
-    folder = '/home/dockeruser/bii_tracking/data/'
+    # folder = '/home/dockeruser/bii_tracking/data/'
+    folder = '/home/gubaidulin/'
     beam_monitor = BeamMonitor(ring.h,
                                save_every=1,
                                buffer_size=int(n_turns//4),
@@ -129,7 +126,7 @@ def run(beam_current=500e-3,
 
     N = len(average_pressure)
     trans_one_turn = [item for t_item, b_items in zip(trans_one_turn, [beam_ion_elements[i:i+N] for i in range(0, len(beam_ion_elements), N)]) for item in [t_item] + b_items]
-    for i in tqdm(range(n_turns)):
+    for _ in tqdm(range(n_turns)):
         long_map.track(beam)
         rf.track(beam)
         # wp.track(beam)
@@ -168,7 +165,6 @@ def _prepare_beam(ring,
                                     scale=.01*charge_variation*bunch_current,
                                     size=ring.h)
     filling_pattern = np.ones(ring.h)*bunch_current
-    # for i in range(gap_length): filling_pattern[::(ring.h//n_gaps+i)] = 0
     mybeam.init_beam(
         filling_pattern,
         current_per_bunch=bunch_current,
@@ -214,46 +210,46 @@ def _prepare_BI(ring,
     f'feedback_tau={feedback_tau:}'+')'
     beam_ion_elements = []
     np.random.seed(42)
-    for i in range(n_segments):
+    for _ in range(n_segments):
         for (p, pv, A, Si) in zip(average_pressure, pressure_variation, ion_mass, sigma_i):
             pressure = np.random.normal(loc=p,
                                         scale=0.01*pv*p,
                                         size=1)
-            beam_ion_elements.append(BeamIonElement(ion_mass=A*m_p,
+            bi = BeamIonElement(ion_mass=A*m_p,
                     ion_charge=e,
                     ionization_cross_section=Si,
                     residual_gas_density=pressure,
                     ring=ring,
                     ion_field_model=ion_field_model,
                     electron_field_model=electron_field_model,
-                    bunch_spacing=0.85,
                     ion_element_length=ring.L,
-                    ion_beam_monitor_name='ion_monitor'+appendix+'.hdf5',
-                    use_ion_phase_space_monitor=False,
-                    # use_aperture=True,
-                    x_radius=5*np.sqrt(ring.emit[0]*ring.optics.local_beta[0]),
-                    y_radius = 5*np.sqrt(ring.emit[1]*ring.optics.local_beta[1]),
-                    n_steps=n_steps
-                    ))
+                    )
+
+            ion_aperture = IonAperture(5*beam[0]['x'].std(), 5*beam[0]['y'].std())
+            ion_monitor = IonMonitor(save_every=1, buffer_size=416*n_turns//10,
+                                     total_size=416*n_turns, file_name='ion_monitor')
+            bi.apertures.append(ion_aperture)
+            bi.monitors.append(ion_monitor)
+            beam_ion_elements.append(bi)
 
     return beam_ion_elements
 
-def _prepare_monitors(n_macroparticles,
-        gap_length,
-        n_turns,
-        n_segments,
-        n_gaps,
-        h_rf,
-        ion_field_model,
-        electron_field_model,
-        smooth,
-        charge_variation,
-        pressure_variation,
-        average_pressure,
-        beam_current,
-        ion_mass,
-        sigma_i):
-    return monitor_list, folder
+# def _prepare_monitors(n_macroparticles,
+#         gap_length,
+#         n_turns,
+#         n_segments,
+#         n_gaps,
+#         h_rf,
+#         ion_field_model,
+#         electron_field_model,
+#         smooth,
+#         charge_variation,
+#         pressure_variation,
+#         average_pressure,
+#         beam_current,
+#         ion_mass,
+#         sigma_i):
+#     return monitor_list, folder
 
 if __name__ == "__main__":
     sys.exit()
