@@ -9,9 +9,9 @@ from mbtrack2.tracking.element import (transverse_map_sector_generator)
 from mbtrack2.tracking.monitors import BeamMonitor
 from mbtrack2.tracking.feedback import ExponentialDamper, FIRDamper
 from soleil import v2366_v2
-from scipy.constants import m_p
+from scipy.constants import m_p, e, c
 # from scipy.interpolate import interp1d
-from SOLEILII_parameters.SOLEILII_TDR_parameters import *
+# from SOLEILII_parameters.SOLEILII_TDR_parameters import *
 from tqdm import tqdm
 # from utils import get_parser_for_bii
 
@@ -145,6 +145,7 @@ def _prepare_maps(ring,
                 h_rf,
                 smooth):
     long_map = LongitudinalMap(ring)
+    V_RF = 1.7e6
     rf = RFCavity(ring, m=1, Vc=V_RF, theta=np.arccos(ring.U0 / V_RF))
     sr = SynchrotronRadiation(ring, switch=[1, 0, 0])
     positions = np.linspace(0, ring.L, n_segments)
