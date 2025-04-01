@@ -7,7 +7,7 @@ mount_destination = ["/home/dockeruser/bii_tracking/"]
 server = "ccrt" 
 # Job setup
 [job]
-name = "collimation" 
+name = "test_bii" 
 time = 600 
 n_cpu = 24 
 partition = "milan" 
