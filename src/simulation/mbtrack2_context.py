@@ -211,7 +211,7 @@ def _prepare_BI(ring,
     f'feedback_tau={feedback_tau:}'+')'
     beam_ion_elements = []
     np.random.seed(42)
-    for _ in range(n_segments):
+    for i in range(n_segments):
         for (p, pv, A, Si) in zip(average_pressure, pressure_variation, ion_mass, sigma_i):
             pressure = np.random.normal(loc=p,
                                         scale=0.01*pv*p,
@@ -227,10 +227,11 @@ def _prepare_BI(ring,
                     )
 
             ion_aperture = IonAperture(5*beam[0]['x'].std(), 5*beam[0]['y'].std())
-            ion_monitor = IonMonitor(save_every=1, buffer_size=416*n_turns//10,
-                                     total_size=416*n_turns, file_name='ion_monitor')
             bi.apertures.append(ion_aperture)
-            bi.monitors.append(ion_monitor)
+            if i  == 0:
+                ion_monitor = IonMonitor(save_every=1, buffer_size=416*n_turns//10,
+                                     total_size=416*n_turns, file_name='ion_monitor')
+                bi.monitors.append(ion_monitor)
             beam_ion_elements.append(bi)
 
     return beam_ion_elements
