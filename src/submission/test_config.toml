@@ -15,8 +15,8 @@ err_folder = "/ccc/work/cont003/soleil/gubaiduv/err/"
 out_folder = "/ccc/work/cont003/soleil/gubaiduv/out/"
 [script]
 name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
-n_macroparticles = 100000
-n_turns = 5000
+n_macroparticles = 10000
+n_turns = 500
 gap_length = 1
 n_gaps = 4
 n_segments = 8
