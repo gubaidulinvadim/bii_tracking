@@ -75,8 +75,8 @@ def run(beam_current=500e-3,
                                                 n_segments,
                                                 h_rf,
                                                 smooth)
-    # folder = '/home/dockeruser/bii_tracking/data/'
-    folder = '/home/gubaidulin/'
+    folder = '/home/dockeruser/bii_tracking/data/'
+    # folder = '/home/gubaidulin/'
     beam_monitor = BeamMonitor(ring.h,
                                save_every=1,
                                buffer_size=int(n_turns//4),
