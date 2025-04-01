@@ -26,10 +26,10 @@ ion_field_model = 'weak'
 electron_field_model = 'weak'
 charge_variation = 0
 pressure_variation = 0
-average_pressure = 2.9e12
+average_pressure = [2.9e12]
 beam_current = 0.5
-sigma_i = 2.79e-22
-ion_mass = 44
+sigma_i = [2.79e-22]
+ion_mass = [44]
 code = "mbtrack2"
 feedback_tau = 0
 
