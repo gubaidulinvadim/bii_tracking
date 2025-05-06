@@ -185,7 +185,7 @@ def _prepare_beam(ring,
 def _prepare_BI(ring,
                 folder,
                 n_segments,
-                h_rf,
+                # h_rf,
                 n_turns,
                 gap_length,
                 n_gaps,
@@ -197,7 +197,7 @@ def _prepare_BI(ring,
                 ion_field_model,
                 electron_field_model,
                 beam,
-                n_steps,
+                # n_steps,
                 feedback_tau
                 ):
     appendix = f'(Ib={int(beam.current*1e3)}mA,'+\
@@ -223,7 +223,7 @@ def _prepare_BI(ring,
                     ring=ring,
                     ion_field_model=ion_field_model,
                     electron_field_model=electron_field_model,
-                    ion_element_length=ring.L,
+                    ion_element_length=ring.L/n_segments,
                     )
 
             ion_aperture = IonAperture(5*beam[0]['x'].std(), 5*beam[0]['y'].std())
