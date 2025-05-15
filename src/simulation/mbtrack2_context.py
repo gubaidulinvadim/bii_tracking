@@ -125,8 +125,9 @@ def run(beam_current=500e-3,
                                     )
 
     N = len(average_pressure)
+    print('before implanting beam-ion elements', trans_one_turn)
     trans_one_turn = [item for t_item, b_items in zip(trans_one_turn, [beam_ion_elements[i:i+N] for i in range(0, len(beam_ion_elements), N)]) for item in [t_item] + b_items]
-    print(trans_one_turn)
+    print('after implanting beam-ion_elements', trans_one_turn)
     for _ in tqdm(range(n_turns)):
         long_map.track(beam)
         rf.track(beam)
