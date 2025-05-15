@@ -232,8 +232,7 @@ def _prepare_BI(ring,
     np.random.seed(42)
     for i in range(n_segments):
         for (p, pv, A, Si) in zip(average_pressure, pressure_variation, ion_mass, sigma_i):
-            print(f'Making a beam-ion element for {p:}, {pv:}, ion mass {A:},
-                  ionisation crosssection{Si:.2e}')
+            print(f'Making a beam-ion element for {p:}, {pv:}, ion mass {A:}, ionisation crosssection{Si:.2e}')
             pressure = np.random.normal(loc=p,
                                         scale=0.01*pv*p,
                                         size=1)
