@@ -231,7 +231,7 @@ def _prepare_BI(ring,
             if i  == 0:
                 ion_monitor = IonMonitor(save_every=1, buffer_size=416*n_turns//10,
                                      total_size=416*n_turns, file_name=folder +
-                                         f'ion_monitor_{ion_mass}' + appendix + '.hdf5')
+                                         f'ion_monitor_{A}' + appendix + '.hdf5')
                 bi.monitors.append(ion_monitor)
             beam_ion_elements.append(bi)
 
