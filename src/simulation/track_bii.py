@@ -26,6 +26,7 @@ def run(n_macroparticles=int(5e3),
         ion_mass=[28],
         sigma_i=[1.78e-22],
         feedback_tau=0,
+        chromaticity=0,
         code='pyht'):
         if code == 'pyht':
             import pyht_context as context
@@ -46,6 +47,7 @@ def run(n_macroparticles=int(5e3),
                 beam_current=beam_current,
                 ion_mass=ion_mass,
                 sigma_i=sigma_i,
+                chromaticity=chromaticity,
                 feedback_tau=feedback_tau)
         return 0
 
