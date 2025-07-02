@@ -45,6 +45,7 @@ def run(beam_current=500e-3,
                                 f'smooth={smooth},'+\
                                     f'average_pressure={average_pressure[0]:.1e}'+\
                                     f'feedback_tau={feedback_tau:}'+\
+                                    f'{chromaticity=:}' +\
                                         f')'
     particle = Electron()
     chro = np.array([chromaticity[0], chromaticity[1]])
@@ -228,7 +229,8 @@ def _prepare_BI(ring,
     f'n_segments={int(n_segments)},'+\
     f'charge_var={int(charge_variation)},'+\
     f'average_pressure={average_pressure[0]:.1e},'+\
-    f'feedback_tau={feedback_tau:}'+')'
+    f'feedback_tau={feedback_tau:}'+ \
+    ')'
     beam_ion_elements = []
     np.random.seed(42)
     for i in range(n_segments):
