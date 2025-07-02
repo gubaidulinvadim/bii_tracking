@@ -33,7 +33,7 @@ def run(beam_current=500e-3,
         average_pressure=[3.9e12],
         ion_mass=[28],
         sigma_i=[1.78e-22],
-        chromaticity=0,
+        chromaticity=[0,0],
         feedback_tau = 0):
     appendix = f'(Ib={int(beam_current*1e3)}mA,'+\
         f'n_macroparticles={n_macroparticles:.1e},'+\

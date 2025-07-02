@@ -95,6 +95,8 @@ if __name__ == "__main__":
         sigma_i=config['sigma_i'],
         ion_mass=config['ion_mass'],
         code=config['code'],
-        feedback_tau=config['feedback_tau'])
+        feedback_tau=config['feedback_tau']
+        chromaticity=config.get('chromaticity', [0, 0]))
+
 
     sys.exit()
