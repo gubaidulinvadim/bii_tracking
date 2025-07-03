@@ -61,24 +61,6 @@ if __name__ == "__main__":
     with open(args.config_file, 'rb') as f:
         config = tomllib.load(f)['script']
 
-    # run(n_macroparticles=args.n_macroparticles,
-    #     n_turns=args.n_turns,
-    #     gap_length=args.gap_length,
-    #     n_gaps=args.n_gaps,
-    #     n_segments=args.n_segments,
-    #     smooth=args.is_smooth,
-    #     h_rf=args.h_rf,
-    #     ion_field_model=args.ion_field_model,
-    #     electron_field_model=args.electron_field_model,
-    #     charge_variation=args.charge_variation,
-    #     pressure_variation=args.pressure_variation,
-    #     average_pressure=args.average_pressure,
-    #     beam_current=args.beam_current,
-    #     sigma_i=args.sigma_i,
-    #     ion_mass=args.ion_mass,
-    #     code=args.code,
-    #     feedback_tau=args.feedback_tau)
-
     run(n_macroparticles=config['n_macroparticles'],
         n_turns=config['n_turns'],
         gap_length=config['gap_length'],
