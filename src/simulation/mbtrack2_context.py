@@ -123,7 +123,8 @@ def run(beam_current=500e-3,
                                     electron_field_model,
                                     beam,
                                     n_turns*h_rf,
-                                    feedback_tau
+                                    feedback_tau,
+                                    chromaticity
                                     )
 
     N = len(average_pressure)
@@ -219,7 +220,8 @@ def _prepare_BI(ring,
                 electron_field_model,
                 beam,
                 n_steps,
-                feedback_tau
+                feedback_tau,
+                chromaticity
                 ):
     appendix = f'(Ib={int(beam.current*1e3)}mA,'+\
     f'n_macroparticles={beam[0].mp_number:.1e},'+\
@@ -230,6 +232,7 @@ def _prepare_BI(ring,
     f'charge_var={int(charge_variation)},'+\
     f'average_pressure={average_pressure[0]:.1e},'+\
     f'feedback_tau={feedback_tau:}'+ \
+    f'{chromaticity=}'+\
     ')'
     beam_ion_elements = []
     np.random.seed(42)
