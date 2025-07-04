@@ -7,7 +7,7 @@ mount_destination = ["/home/dockeruser/bii_tracking/"]
 server = "ccrt"
 # Job setup
 [job]
-name = "pessimistic_100Ah_500mA_mix_chroma0"
+name = "pessimistic_100Ah_500mA_mix_chroma15"
 time = 86000
 n_cpu = 24
 partition = "milan"
