@@ -3,17 +3,14 @@ sys.path.append('../input')
 import numpy as np
 from mbtrack2 import (Electron, Synchrotron)
 from mbtrack2.tracking import (Beam, LongitudinalMap, RFCavity,
-                               SynchrotronRadiation)
+                               SynchrotronRadiation, TransverseSpaceCharge)
 from mbtrack2.tracking.beam_ion_effects import BeamIonElement, IonAperture, IonMonitor
 from mbtrack2.tracking.element import (transverse_map_sector_generator)
 from mbtrack2.tracking.monitors import BeamMonitor
 from mbtrack2.tracking.feedback import ExponentialDamper, FIRDamper
 from soleil import v2366_v2
 from scipy.constants import m_p, e, c
-# from scipy.interpolate import interp1d
-# from SOLEILII_parameters.SOLEILII_TDR_parameters import *
 from tqdm import tqdm
-# from utils import get_parser_for_bii
 
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 FOLDER_PATH = '/home/dockeruser/bii_tracking/'
@@ -34,6 +31,7 @@ def run(beam_current=500e-3,
         ion_mass=[28],
         sigma_i=[1.78e-22],
         chromaticity=[0,0],
+        sc=False,
         feedback_tau = 0):
     appendix = f'(Ib={int(beam_current*1e3)}mA,'+\
         f'n_macroparticles={n_macroparticles:.1e},'+\
@@ -46,6 +44,7 @@ def run(beam_current=500e-3,
                                     f'average_pressure={average_pressure[0]:.1e}'+\
                                     f'feedback_tau={feedback_tau:}'+\
                                     f'{chromaticity=:}' +\
+                                    f'{sc=}'+\
                                         f')'
     particle = Electron()
     chro = np.array([chromaticity[0], chromaticity[1]])
@@ -106,7 +105,10 @@ def run(beam_current=500e-3,
                     # max_kick=1.6e-6)
     fbty = ExponentialDamper(ring, plane='y', damping_time=ring.T0*feedback_tau, phase_diff=np.pi/2)
     fbtx = ExponentialDamper(ring, plane='x', damping_time=ring.T0*feedback_tau, phase_diff=np.pi/2)
-
+    
+    
+    spacecharge = TransverseSpaceCharge(ring, interaction_length=ring.L,
+                                        n_bins=100)
     beam_ion_elements = _prepare_BI(ring,
                                     folder,
                                     n_segments,
@@ -124,7 +126,8 @@ def run(beam_current=500e-3,
                                     beam,
                                     n_turns*h_rf,
                                     feedback_tau,
-                                    chromaticity
+                                    chromaticity,
+                                    sc
                                     )
 
     N = len(average_pressure)
@@ -156,6 +159,8 @@ def run(beam_current=500e-3,
         if feedback_tau != 0:
             fbtx.track(beam)
             fbty.track(beam)
+        if sc:
+            spacecharge.track(beam)
         for _t in trans_one_turn:
             _t.track(beam)
         beam_monitor.track(beam)
@@ -221,7 +226,8 @@ def _prepare_BI(ring,
                 beam,
                 n_steps,
                 feedback_tau,
-                chromaticity
+                chromaticity,
+                sc
                 ):
     appendix = f'(Ib={int(beam.current*1e3)}mA,'+\
     f'n_macroparticles={beam[0].mp_number:.1e},'+\
@@ -233,6 +239,7 @@ def _prepare_BI(ring,
     f'average_pressure={average_pressure[0]:.1e},'+\
     f'feedback_tau={feedback_tau:}'+ \
     f'{chromaticity=}'+\
+    f'{sc=}'+\
     ')'
     beam_ion_elements = []
     np.random.seed(42)
