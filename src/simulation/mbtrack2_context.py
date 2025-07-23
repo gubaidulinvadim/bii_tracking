@@ -155,7 +155,7 @@ def run(beam_current=500e-3,
         long_map.track(beam)
         rf.track(beam)
         # wp.track(beam)
-        # sr.track(beam)
+        sr.track(beam)
         if feedback_tau != 0:
             fbtx.track(beam)
             fbty.track(beam)
