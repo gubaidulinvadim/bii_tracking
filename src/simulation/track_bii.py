@@ -54,11 +54,15 @@ def run(n_macroparticles=int(5e3),
         feedback_tau=0,
         chromaticity=[0, 0],
         sc=False,
+        emittance_ratio=0.3,
         code='pyht'):
     if code == 'pyht':
         import pyht_context as context
     elif code == 'mbtrack2':
         import mbtrack2_context as context
+    else:
+        raise ValueError(f"Unknown code '{code}'. Supported codes are 'pyht' \
+        and 'mbtrack2'.")
     context.run(n_macroparticles=n_macroparticles,
                 gap_length=gap_length,
                 n_turns=n_turns,
@@ -76,7 +80,8 @@ def run(n_macroparticles=int(5e3),
                 sigma_i=sigma_i,
                 chromaticity=chromaticity,
                 sc=sc,
-                feedback_tau=feedback_tau)
+                feedback_tau=feedback_tau,
+                emittance_ratio=emittance_ratio)
     return 0
 
 
@@ -115,6 +120,7 @@ if __name__ == "__main__":
         code=config['code'],
         feedback_tau=config['feedback_tau'],
         sc=config.get('sc', False),
-        chromaticity=config.get('chromaticity', [0, 0]))
+        chromaticity=config.get('chromaticity', [0, 0]),
+        emittance_ratio=config.get('emittance_ratio', 0.3))
 
     sys.exit()

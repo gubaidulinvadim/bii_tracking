@@ -4,10 +4,12 @@ import numpy as np
 from mbtrack2 import (Electron, Synchrotron)
 from mbtrack2.tracking import (Beam, LongitudinalMap, RFCavity,
                                SynchrotronRadiation, TransverseSpaceCharge)
-from mbtrack2.tracking.beam_ion_effects import BeamIonElement, IonAperture, IonMonitor
+from mbtrack2.tracking.aperture import ElipticalAperture
+from mbtrack2.tracking.beam_ion_effects import BeamIonElement
+from mbtrack2.tracking.monitors import IonMonitor 
 from mbtrack2.tracking.element import (transverse_map_sector_generator)
 from mbtrack2.tracking.monitors import BeamMonitor
-from mbtrack2.tracking.feedback import ExponentialDamper, FIRDamper
+from mbtrack2.tracking.feedback import TransverseExponentialDamper
 from soleil import v2366_v2
 from scipy.constants import m_p, e, c
 from tqdm import tqdm
@@ -32,7 +34,8 @@ def run(beam_current=500e-3,
         sigma_i=[1.78e-22],
         chromaticity=[0,0],
         sc=False,
-        feedback_tau = 0):
+        feedback_tau = 0,
+        emittance_ratio=0.3):
     appendix = f'(Ib={int(beam_current*1e3)}mA,'+\
         f'n_macroparticles={n_macroparticles:.1e},'+\
             f'n_turns={int(n_turns)},'+\
@@ -45,6 +48,7 @@ def run(beam_current=500e-3,
                                     f'feedback_tau={feedback_tau:}'+\
                                     f'{chromaticity=:}' +\
                                     f'{sc=}'+\
+                                    f'{emittance_ratio=}'+\
                                         f')'
     particle = Electron()
     chro = np.array([chromaticity[0], chromaticity[1]])
@@ -58,7 +62,7 @@ def run(beam_current=500e-3,
         ac=ring2.ac,
         U0=ring2.U0,
         tau=ring2.tau,
-        emit=np.array([ring2.emit[0], 0.3*ring2.emit[0]]),
+        emit=np.array([ring2.emit[0], emittance_ratio*ring2.emit[0]]),
         tune=ring2.tune,
         sigma_delta=ring2.sigma_delta,
         sigma_0=ring2.sigma_0,
@@ -85,26 +89,9 @@ def run(beam_current=500e-3,
                                file_name=folder+'beam_monitor'+appendix,
                                mpi_mode=False)    
     
-    # fbty = FIRDamper(ring,
-                    # plane='y',
-                    # tune=ring.tune[1],
-                    # turn_delay=1,
-                    # tap_number=7,
-                    # gain=1,
-                    # phase=90,
-                    # bpm_error=None,
-                    # max_kick=1.6e-6)
-    # fbtx = FIRDamper(ring,
-                    # plane='x',
-                    # tune=ring.tune[0],
-                    # turn_delay=1,
-                    # tap_number=7,
-                    # gain=1,
-                    # phase=90,
-                    # bpm_error=None,
-                    # max_kick=1.6e-6)
-    fbty = ExponentialDamper(ring, plane='y', damping_time=ring.T0*feedback_tau, phase_diff=np.pi/2)
-    fbtx = ExponentialDamper(ring, plane='x', damping_time=ring.T0*feedback_tau, phase_diff=np.pi/2)
+    fbt = TransverseExponentialDamper(ring,
+                                      damping_time=np.array([feedback_tau,feedback_tau]),
+                             phase_diff=np.array([90, 90]))
     
     
     spacecharge = TransverseSpaceCharge(ring, interaction_length=ring.L,
@@ -127,7 +114,9 @@ def run(beam_current=500e-3,
                                     n_turns*h_rf,
                                     feedback_tau,
                                     chromaticity,
-                                    sc
+                                    sc,
+                                    smooth, 
+                                    emittance_ratio
                                     )
 
     N = len(average_pressure)
@@ -157,8 +146,7 @@ def run(beam_current=500e-3,
         # wp.track(beam)
         sr.track(beam)
         if feedback_tau != 0:
-            fbtx.track(beam)
-            fbty.track(beam)
+            fbt.track(beam)
         if sc:
             spacecharge.track(beam)
         for _t in trans_one_turn:
@@ -174,7 +162,7 @@ def _prepare_maps(ring,
     long_map = LongitudinalMap(ring)
     V_RF = 1.7e6
     rf = RFCavity(ring, m=1, Vc=V_RF, theta=np.arccos(ring.U0 / V_RF))
-    sr = SynchrotronRadiation(ring, switch=[1, 0, 0])
+    sr = SynchrotronRadiation(ring, switch=np.array([1, 0, 0]))
     positions = np.linspace(0, ring.L, n_segments)
     trans_one_turn = transverse_map_sector_generator(ring, positions)
     return rf, long_map, trans_one_turn, sr
@@ -227,20 +215,22 @@ def _prepare_BI(ring,
                 n_steps,
                 feedback_tau,
                 chromaticity,
-                sc
+                sc,
+                smooth,
+                emittance_ratio,
                 ):
-    appendix = f'(Ib={int(beam.current*1e3)}mA,'+\
-    f'n_macroparticles={beam[0].mp_number:.1e},'+\
-    f'n_turns={int(n_turns)},'+\
-    f'n_gaps={int(n_gaps)},'+\
-    f'gap_length={int(gap_length)},'+\
-    f'n_segments={int(n_segments)},'+\
-    f'charge_var={int(charge_variation)},'+\
-    f'average_pressure={average_pressure[0]:.1e},'+\
-    f'feedback_tau={feedback_tau:}'+ \
-    f'{chromaticity=}'+\
-    f'{sc=}'+\
-    ')'
+    appendix = f'n_turns={int(n_turns)},'+\
+                f'n_gaps={int(n_gaps)},'+\
+                    f'gap_length={int(gap_length)},'+\
+                        f'n_segments={int(n_segments)},'+\
+                            f'charge_var={int(charge_variation)},'+\
+                                f'smooth={smooth},'+\
+                                    f'average_pressure={average_pressure[0]:.1e}'+\
+                                    f'feedback_tau={feedback_tau:}'+\
+                                    f'{chromaticity=:}' +\
+                                    f'{sc=}'+\
+                                    f'{emittance_ratio=}'+\
+                                        f')'
     beam_ion_elements = []
     np.random.seed(42)
     for i in range(n_segments):
@@ -259,7 +249,9 @@ def _prepare_BI(ring,
                     ion_element_length=ring.L/n_segments,
                     )
 
-            ion_aperture = IonAperture(5*beam[0]['x'].std(), 5*beam[0]['y'].std())
+            ion_aperture = ElipticalAperture(5*beam[0]['x'].std(),
+                                              5*beam[0]['y'].std(),
+                                              delete_particles=True)
             bi.apertures.append(ion_aperture)
             if i  == 0:
                 ion_monitor = IonMonitor(save_every=1, buffer_size=416*n_turns//10,
@@ -269,23 +261,6 @@ def _prepare_BI(ring,
             beam_ion_elements.append(bi)
 
     return beam_ion_elements
-
-# def _prepare_monitors(n_macroparticles,
-#         gap_length,
-#         n_turns,
-#         n_segments,
-#         n_gaps,
-#         h_rf,
-#         ion_field_model,
-#         electron_field_model,
-#         smooth,
-#         charge_variation,
-#         pressure_variation,
-#         average_pressure,
-#         beam_current,
-#         ion_mass,
-#         sigma_i):
-#     return monitor_list, folder
 
 if __name__ == "__main__":
     sys.exit()

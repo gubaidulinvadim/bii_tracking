@@ -20,11 +20,10 @@ import copy
 import itertools
 import os
 import subprocess
-import sys
 
 import numpy as np
 
-from utils import load_config, validate_config, write_toml
+from .utils import load_config, validate_config, write_toml
 
 
 def expand_scan_values(scan_spec) -> list:
