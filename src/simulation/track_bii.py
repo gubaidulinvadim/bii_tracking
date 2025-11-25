@@ -13,6 +13,29 @@ PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 FOLDER_PATH = '/home/dockeruser/bii_tracking/'
 
 
+def load_config(config_file: str) -> dict:
+    """Load and parse a .toml configuration file.
+
+    Args:
+        config_file: Path to the .toml configuration file.
+
+    Returns:
+        Parsed configuration dictionary.
+
+    Raises:
+        SystemExit: If the configuration file is not found or invalid.
+    """
+    try:
+        with open(config_file, 'rb') as f:
+            return tomllib.load(f)
+    except FileNotFoundError:
+        print(f"Error: Configuration file '{config_file}' not found.")
+        sys.exit(1)
+    except tomllib.TOMLDecodeError as e:
+        print(f"Error: Invalid TOML in '{config_file}': {e}")
+        sys.exit(1)
+
+
 def run(n_macroparticles=int(5e3),
         gap_length=1,
         n_turns=int(3000),
@@ -62,19 +85,11 @@ if __name__ == "__main__":
         description="Track beam-ion instability in a light source storage ring using a TOML configuration file."
     )
     parser.add_argument('--config_file', action='store', metavar='CONFIG_FILE',
-                        type=str, required=True,
-                        help='Configuration file in the TOML format.')
+                        type=str, default='config.toml',
+                        help='Configuration file in the TOML format (default: config.toml).')
     args = parser.parse_args()
 
-    try:
-        with open(args.config_file, 'rb') as f:
-            full_config = tomllib.load(f)
-    except FileNotFoundError:
-        print(f"Error: Configuration file '{args.config_file}' not found.")
-        sys.exit(1)
-    except tomllib.TOMLDecodeError as e:
-        print(f"Error: Invalid TOML in '{args.config_file}': {e}")
-        sys.exit(1)
+    full_config = load_config(args.config_file)
 
     if 'script' not in full_config:
         print(f"Error: Configuration file '{args.config_file}' must contain a [script] section.")

@@ -18,68 +18,13 @@ When multiple parameters are scanned, all combinations are submitted.
 import argparse
 import copy
 import itertools
+import os
 import subprocess
 import sys
-import tomllib
 
 import numpy as np
 
-
-def write_toml(data: dict, filepath: str) -> None:
-    """Write a dictionary to a TOML file.
-
-    Args:
-        data: Dictionary to write.
-        filepath: Path to the output file.
-    """
-    def format_value(value):
-        if isinstance(value, bool):
-            return 'true' if value else 'false'
-        elif isinstance(value, str):
-            return f'"{value}"'
-        elif isinstance(value, (int, float, np.integer, np.floating)):
-            return str(value)
-        elif isinstance(value, list):
-            items = ', '.join(format_value(item) for item in value)
-            return f'[{items}]'
-        else:
-            return str(value)
-
-    with open(filepath, 'w') as f:
-        # Write top-level key-value pairs
-        for key, value in data.items():
-            if not isinstance(value, dict):
-                f.write(f'{key} = {format_value(value)}\n')
-
-        # Write sections
-        for key, value in data.items():
-            if isinstance(value, dict):
-                f.write(f'\n[{key}]\n')
-                for subkey, subvalue in value.items():
-                    f.write(f'{subkey} = {format_value(subvalue)}\n')
-
-
-def load_config(config_file: str) -> dict:
-    """Load and parse a .toml configuration file.
-
-    Args:
-        config_file: Path to the .toml configuration file.
-
-    Returns:
-        Parsed configuration dictionary.
-
-    Raises:
-        SystemExit: If the configuration file is not found or invalid.
-    """
-    try:
-        with open(config_file, 'rb') as f:
-            return tomllib.load(f)
-    except FileNotFoundError:
-        print(f"Error: Configuration file '{config_file}' not found.")
-        sys.exit(1)
-    except tomllib.TOMLDecodeError as e:
-        print(f"Error: Invalid TOML in '{config_file}': {e}")
-        sys.exit(1)
+from utils import load_config, validate_config, write_toml
 
 
 def expand_scan_values(scan_spec) -> list:
@@ -101,23 +46,6 @@ def expand_scan_values(scan_spec) -> list:
         return np.linspace(start, stop, num).tolist()
     else:
         return [scan_spec]
-
-
-def validate_config(config: dict) -> None:
-    """Validate that required configuration sections exist.
-
-    Args:
-        config: Configuration dictionary to validate.
-
-    Raises:
-        SystemExit: If required sections are missing.
-    """
-    if 'script' not in config:
-        print("Error: Configuration file must contain a [script] section.")
-        sys.exit(1)
-    if 'job' not in config:
-        print("Error: Configuration file must contain a [job] section.")
-        sys.exit(1)
 
 
 def generate_scan_configs(base_config: dict) -> list:
@@ -177,12 +105,15 @@ def submit_job(config: dict, config_file: str) -> None:
     Args:
         config: Configuration dictionary.
         config_file: Path to save the config file.
+
+    Raises:
+        subprocess.CalledProcessError: If the submission fails.
     """
     # Write config to a temporary TOML file
     write_toml(config, config_file)
 
     # Submit using submission.py with subprocess for safety
-    subprocess.run(['python', 'submission.py', '--config_file', config_file], check=False)
+    subprocess.run(['python', 'submission.py', '--config_file', config_file], check=True)
 
 
 def main():
@@ -195,14 +126,17 @@ def main():
                         help='Path to the .toml configuration file with [scan] section.')
     parser.add_argument('--dry-run', action='store_true',
                         help='Print jobs that would be submitted without actually submitting.')
+    parser.add_argument('--keep-configs', action='store_true',
+                        help='Keep generated config files after submission (default: remove them).')
     args = parser.parse_args()
 
     config = load_config(args.config_file)
-    validate_config(config)
+    validate_config(config, args.config_file)
     scan_configs = generate_scan_configs(config)
 
     print(f"Generated {len(scan_configs)} job(s) from scan configuration.")
 
+    generated_files = []
     for i, (job_name, job_config) in enumerate(scan_configs, 1):
         if args.dry_run:
             script_section = job_config.get('script', {})
@@ -211,12 +145,17 @@ def main():
         else:
             print(f"Submitting [{i}/{len(scan_configs)}]: {job_name}")
             config_file = f"{job_name}_config.toml"
+            generated_files.append(config_file)
             submit_job(job_config, config_file)
-            # Optionally clean up config file after submission
-            # os.remove(config_file)
 
     if args.dry_run:
         print("\n(Dry run mode - no jobs were submitted)")
+    elif not args.keep_configs:
+        # Clean up generated config files
+        for config_file in generated_files:
+            if os.path.exists(config_file):
+                os.remove(config_file)
+        print(f"Cleaned up {len(generated_files)} generated config file(s).")
 
 
 if __name__ == '__main__':

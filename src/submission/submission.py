@@ -1,7 +1,8 @@
 import argparse
 import os
 import sys
-import tomllib
+
+from utils import load_config, validate_config
 
 
 def get_command_string(config_file: str, script_name: str) -> str:
@@ -106,30 +107,6 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
     return job_name
 
 
-def load_config(config_file: str) -> dict:
-    """Load and parse a .toml configuration file.
-
-    Args:
-        config_file: Path to the .toml configuration file.
-
-    Returns:
-        Parsed configuration dictionary.
-
-    Raises:
-        FileNotFoundError: If the configuration file does not exist.
-        tomllib.TOMLDecodeError: If the file is not valid TOML.
-    """
-    try:
-        with open(config_file, 'rb') as f:
-            return tomllib.load(f)
-    except FileNotFoundError:
-        print(f"Error: Configuration file '{config_file}' not found.")
-        sys.exit(1)
-    except tomllib.TOMLDecodeError as e:
-        print(f"Error: Invalid TOML in '{config_file}': {e}")
-        sys.exit(1)
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Submit a beam-ion instability simulation job using a TOML configuration file."
@@ -140,6 +117,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = load_config(args.config_file)
+    validate_config(config, args.config_file)
+    
     env = config.get('environment', {})
     job = config.get('job', {})
 
