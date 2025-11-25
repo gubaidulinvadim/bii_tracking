@@ -1,11 +1,10 @@
 import argparse
-import json
 import os
 import sys
 
 # Add parent directory to path for config module import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import load_toml_config, merge_config_and_args
+from config import load_toml_config, merge_config_and_args, str_to_bool, parse_json_array
 
 pypath = os.getenv('PYTHONPATH', '')
 pypath = pypath + ':/home/dockeruser/machine_data'
@@ -116,27 +115,27 @@ Example usage:
     parser.add_argument('--electron_field_model', type=str, default=None,
                         choices=['weak', 'strong', 'PIC'],
                         help='Electron field model (default: strong)')
-    parser.add_argument('--smooth', type=bool, default=None,
+    parser.add_argument('--smooth', type=str_to_bool, default=None,
                         help='Use smooth focusing approximation (default: True)')
-    parser.add_argument('--is_smooth', type=bool, default=None,
+    parser.add_argument('--is_smooth', type=str_to_bool, default=None,
                         help='Alias for --smooth (for config file compatibility)')
     parser.add_argument('--charge_variation', type=float, default=None,
                         help='Charge variation std dev in percent (default: 0.0)')
-    parser.add_argument('--pressure_variation', type=json.loads, default=None,
+    parser.add_argument('--pressure_variation', type=parse_json_array, default=None,
                         help='Pressure variation per species as JSON array (default: [0.0])')
-    parser.add_argument('--average_pressure', type=json.loads, default=None,
+    parser.add_argument('--average_pressure', type=parse_json_array, default=None,
                         help='Average residual gas density per species as JSON array (default: [3.9e12])')
     parser.add_argument('--beam_current', type=float, default=None,
                         help='Total beam current in Amperes (default: 0.5)')
-    parser.add_argument('--ion_mass', type=json.loads, default=None,
+    parser.add_argument('--ion_mass', type=parse_json_array, default=None,
                         help='Ion molecular mass per species as JSON array (default: [28])')
-    parser.add_argument('--sigma_i', type=json.loads, default=None,
+    parser.add_argument('--sigma_i', type=parse_json_array, default=None,
                         help='Ionization cross-section per species as JSON array (default: [1.78e-22])')
     parser.add_argument('--feedback_tau', type=float, default=None,
                         help='Feedback damping time in turns, 0=no feedback (default: 0)')
-    parser.add_argument('--chromaticity', type=json.loads, default=None,
+    parser.add_argument('--chromaticity', type=parse_json_array, default=None,
                         help='Chromaticity [horizontal, vertical] as JSON array (default: [0, 0])')
-    parser.add_argument('--sc', type=bool, default=None,
+    parser.add_argument('--sc', type=str_to_bool, default=None,
                         help='Enable space charge effects (default: False)')
     parser.add_argument('--emittance_ratio', type=float, default=None,
                         help='Emittance ratio (default: 0.3)')

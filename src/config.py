@@ -15,7 +15,57 @@ Usage:
 """
 
 import argparse
+import json
 import sys
+
+
+def str_to_bool(value: str) -> bool:
+    """Convert a string argument to a boolean value.
+
+    Args:
+        value: String value to convert (e.g., 'true', 'false', '1', '0').
+
+    Returns:
+        Boolean value.
+
+    Raises:
+        argparse.ArgumentTypeError: If the value cannot be converted.
+    """
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ('true', 'yes', '1', 'on'):
+        return True
+    if value.lower() in ('false', 'no', '0', 'off'):
+        return False
+    raise argparse.ArgumentTypeError(
+        f"Invalid boolean value: '{value}'. Use 'true'/'false', 'yes'/'no', or '1'/'0'."
+    )
+
+
+def parse_json_array(value: str) -> list:
+    """Parse a JSON array string with helpful error messages.
+
+    Args:
+        value: JSON array string (e.g., '[1, 2, 3]' or '[0.5, 1.0]').
+
+    Returns:
+        Parsed list.
+
+    Raises:
+        argparse.ArgumentTypeError: If the value is not a valid JSON array.
+    """
+    try:
+        result = json.loads(value)
+        if not isinstance(result, list):
+            raise argparse.ArgumentTypeError(
+                f"Expected a JSON array, got {type(result).__name__}: {value}"
+            )
+        return result
+    except json.JSONDecodeError as e:
+        raise argparse.ArgumentTypeError(
+            f"Invalid JSON array: {value}. Expected format: [value1, value2, ...]. "
+            f"Error: {e}"
+        )
 
 
 def load_toml_config(path: str) -> dict:
