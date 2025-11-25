@@ -66,8 +66,21 @@ if __name__ == "__main__":
                         help='Configuration file in the TOML format.')
     args = parser.parse_args()
 
-    with open(args.config_file, 'rb') as f:
-        config = tomllib.load(f)['script']
+    try:
+        with open(args.config_file, 'rb') as f:
+            full_config = tomllib.load(f)
+    except FileNotFoundError:
+        print(f"Error: Configuration file '{args.config_file}' not found.")
+        sys.exit(1)
+    except tomllib.TOMLDecodeError as e:
+        print(f"Error: Invalid TOML in '{args.config_file}': {e}")
+        sys.exit(1)
+
+    if 'script' not in full_config:
+        print(f"Error: Configuration file '{args.config_file}' must contain a [script] section.")
+        sys.exit(1)
+
+    config = full_config['script']
 
     run(n_macroparticles=config['n_macroparticles'],
         n_turns=config['n_turns'],

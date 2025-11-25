@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import tomllib
 
 
@@ -31,9 +32,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
     script = config.get('script', {})
 
     server = env.get('server', 'ccrt')
-    container = env.get('container', '')
     mount_source = env.get('mount_source', ['/ccc/work/cont003/soleil/gubaiduv/bii_tracking/'])
-    mount_destination = env.get('mount_destination', ['/home/dockeruser/bii_tracking/'])
 
     job_name = job.get('name', 'job')
     job_time = job.get('time', 86000)
@@ -46,6 +45,14 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
     script_name = script.get('name', '/home/dockeruser/bii_tracking/src/simulation/track_bii.py')
     code = script.get('code', 'mbtrack2')
 
+    # Determine image name based on code type
+    if is_gpu:
+        image_name = 'pycompletecuda'
+    elif code == 'pyht':
+        image_name = 'pycomplete'
+    else:
+        image_name = 'mbtrack2_ions'
+
     command_string = get_command_string(config_file, script_name)
     machine_data_folder = "/ccc/work/cont003/soleil/gubaiduv/machine_data"
 
@@ -56,15 +63,8 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             f.write("#MSUB -m work,scratch\n")
             if is_gpu:
                 f.write("#MSUB -q a100\n")
-                image_name = 'pycompletecuda'
             else:
                 f.write(f"#MSUB -q {partition}\n")
-                if code == 'pyht':
-                    image_name = 'pycomplete'
-                elif code == 'mbtrack2':
-                    image_name = 'mbtrack2_ions'
-                else:
-                    image_name = container if container else 'mbtrack2_ions'
             f.write("#MSUB -Q long\n")
             f.write("#MSUB -n 1\n")
             f.write(f"#MSUB -c {n_cpu}\n")
@@ -84,7 +84,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
                     + command_string)
         elif server == 'slurm':
             mount_folder = '/lustre/scratch/sources/physmach/gubaidulin/bii_tracking:/home/dockeruser/bii_tracking'
-            image_name = '/lustre/scratch/sources/physmach/gubaidulin/pycompletecuda.sif'
+            slurm_image_name = '/lustre/scratch/sources/physmach/gubaidulin/pycompletecuda.sif'
             os.system('module load singularity')
             os.system('module load cuda')
 
@@ -101,7 +101,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             f.write(f"#SBATCH --output={out_folder}{job_name}.out\n")
             f.write('module load tools/singularity/current\n')
             f.write(
-                f"singularity exec --no-home --nv -B {mount_folder} {image_name} "
+                f"singularity exec --no-home --nv -B {mount_folder} {slurm_image_name} "
                 + command_string)
     return job_name
 
@@ -114,9 +114,20 @@ def load_config(config_file: str) -> dict:
 
     Returns:
         Parsed configuration dictionary.
+
+    Raises:
+        FileNotFoundError: If the configuration file does not exist.
+        tomllib.TOMLDecodeError: If the file is not valid TOML.
     """
-    with open(config_file, 'rb') as f:
-        return tomllib.load(f)
+    try:
+        with open(config_file, 'rb') as f:
+            return tomllib.load(f)
+    except FileNotFoundError:
+        print(f"Error: Configuration file '{config_file}' not found.")
+        sys.exit(1)
+    except tomllib.TOMLDecodeError as e:
+        print(f"Error: Invalid TOML in '{config_file}': {e}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
