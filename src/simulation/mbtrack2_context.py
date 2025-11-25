@@ -1,5 +1,11 @@
+import argparse
+import os
 import sys
 sys.path.append('../input')
+# Add parent directory to path for config module import
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import load_toml_config, merge_config_and_args, str_to_bool, parse_json_array
+
 import numpy as np
 from mbtrack2.tracking import (Beam, LongitudinalMap, RFCavity,
                                SynchrotronRadiation, TransverseSpaceCharge)
@@ -247,5 +253,153 @@ def _prepare_BI(ring,
 
     return beam_ion_elements
 
+
+def parse_args():
+    """Parse command line arguments for mbtrack2 simulation.
+
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="""Run mbtrack2 beam-ion instability simulation.
+
+Supports both CLI arguments and TOML configuration files. CLI arguments
+override values from the config file.
+
+Example usage:
+  # Using config file only:
+  python mbtrack2_context.py --config config.toml
+
+  # Using config file with CLI overrides:
+  python mbtrack2_context.py --config config.toml --n_turns 5000
+
+  # Using CLI arguments only:
+  python mbtrack2_context.py --n_macroparticles 10000 --n_turns 3000
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    # Config file argument
+    parser.add_argument('-c', '--config', metavar='CONFIG_FILE', type=str,
+                        default=None,
+                        help='Path to TOML configuration file. CLI args override config values.')
+
+    # Simulation parameters - all optional with defaults
+    parser.add_argument('--beam_current', type=float, default=None,
+                        help='Total beam current in Amperes (default: 0.5)')
+    parser.add_argument('--n_macroparticles', type=int, default=None,
+                        help='Number of macroparticles per electron bunch (default: 1000)')
+    parser.add_argument('--n_turns', type=int, default=None,
+                        help='Number of turns to simulate (default: 3000)')
+    parser.add_argument('--n_gaps', type=int, default=None,
+                        help='Number of gaps symmetrically distributed (default: 4)')
+    parser.add_argument('--h_rf', type=int, default=None,
+                        help='RF harmonic number (default: 416)')
+    parser.add_argument('--gap_length', type=int, default=None,
+                        help='Gap length as multiple of RF bucket length (default: 1)')
+    parser.add_argument('--ion_field_model', type=str, default=None,
+                        choices=['weak', 'strong', 'PIC'],
+                        help='Ion field model (default: strong)')
+    parser.add_argument('--electron_field_model', type=str, default=None,
+                        choices=['weak', 'strong', 'PIC'],
+                        help='Electron field model (default: weak)')
+    parser.add_argument('--n_segments', type=int, default=None,
+                        help='Number of segments for transverse tracking (default: 25)')
+    parser.add_argument('--smooth', type=str_to_bool, default=None,
+                        help='Use smooth focusing approximation (default: True)')
+    parser.add_argument('--is_smooth', type=str_to_bool, default=None,
+                        help='Alias for --smooth (for config file compatibility)')
+    parser.add_argument('--charge_variation', type=float, default=None,
+                        help='Charge variation std dev in percent (default: 0.0)')
+    parser.add_argument('--pressure_variation', type=parse_json_array, default=None,
+                        help='Pressure variation per species as JSON array (default: [0.0])')
+    parser.add_argument('--average_pressure', type=parse_json_array, default=None,
+                        help='Average residual gas density per species as JSON array (default: [3.9e12])')
+    parser.add_argument('--ion_mass', type=parse_json_array, default=None,
+                        help='Ion molecular mass per species as JSON array (default: [28])')
+    parser.add_argument('--sigma_i', type=parse_json_array, default=None,
+                        help='Ionization cross-section per species as JSON array (default: [1.78e-22])')
+    parser.add_argument('--chromaticity', type=parse_json_array, default=None,
+                        help='Chromaticity [horizontal, vertical] as JSON array (default: [0, 0])')
+    parser.add_argument('--sc', type=str_to_bool, default=None,
+                        help='Enable space charge effects (default: False)')
+    parser.add_argument('--feedback_tau', type=float, default=None,
+                        help='Feedback damping time in turns, 0=no feedback (default: 0)')
+    parser.add_argument('--emittance_ratio', type=float, default=None,
+                        help='Emittance ratio (default: 0.3)')
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
+
+    # Default configuration values
+    defaults = {
+        'beam_current': 0.5,
+        'n_macroparticles': 1000,
+        'n_turns': 3000,
+        'n_gaps': 4,
+        'h_rf': 416,
+        'gap_length': 1,
+        'ion_field_model': 'strong',
+        'electron_field_model': 'weak',
+        'n_segments': 25,
+        'smooth': True,
+        'charge_variation': 0.0,
+        'pressure_variation': [0.0],
+        'average_pressure': [3.9e12],
+        'ion_mass': [28],
+        'sigma_i': [1.78e-22],
+        'chromaticity': [0, 0],
+        'sc': False,
+        'feedback_tau': 0,
+        'emittance_ratio': 0.3
+    }
+
+    # Load config from file if provided
+    if args.config:
+        full_config = load_toml_config(args.config)
+
+        # Support both 'script' section (for backward compatibility) and flat structure
+        if 'script' in full_config:
+            config = full_config['script']
+        else:
+            config = full_config
+
+        # Handle 'is_smooth' alias from config file
+        if 'is_smooth' in config and 'smooth' not in config:
+            config['smooth'] = config.pop('is_smooth')
+    else:
+        config = {}
+
+    # Merge defaults with config, then override with CLI args
+    merged = dict(defaults)
+    merged.update(config)
+    merged = merge_config_and_args(merged, args)
+
+    # Handle 'is_smooth' alias from CLI
+    if args.is_smooth is not None:
+        merged['smooth'] = args.is_smooth
+
+    run(beam_current=merged['beam_current'],
+        n_macroparticles=merged['n_macroparticles'],
+        n_turns=merged['n_turns'],
+        n_gaps=merged['n_gaps'],
+        h_rf=merged['h_rf'],
+        gap_length=merged['gap_length'],
+        ion_field_model=merged['ion_field_model'],
+        electron_field_model=merged['electron_field_model'],
+        n_segments=merged['n_segments'],
+        smooth=merged['smooth'],
+        charge_variation=merged['charge_variation'],
+        pressure_variation=merged['pressure_variation'],
+        average_pressure=merged['average_pressure'],
+        ion_mass=merged['ion_mass'],
+        sigma_i=merged['sigma_i'],
+        chromaticity=merged['chromaticity'],
+        sc=merged['sc'],
+        feedback_tau=merged['feedback_tau'],
+        emittance_ratio=merged['emittance_ratio'])
+
     sys.exit()

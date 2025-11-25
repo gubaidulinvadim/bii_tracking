@@ -1,0 +1,89 @@
+# Example TOML configuration file for beam-ion instability simulations
+#
+# This file contains configuration options for both track_bii.py and
+# mbtrack2_context.py scripts. Options can be organized in a [script] section
+# for backward compatibility, or at the top level.
+#
+# Usage:
+#   python src/simulation/track_bii.py --config example_config.toml
+#   python src/simulation/mbtrack2_context.py --config example_config.toml
+#
+# CLI arguments override values from this config file. For example:
+#   python src/simulation/track_bii.py --config example_config.toml --n_turns 5000
+#
+# This will use n_turns=5000 instead of the value in this file.
+
+title = "Example beam-ion instability simulation configuration"
+
+# =============================================================================
+# Script Configuration
+# =============================================================================
+# All simulation parameters can be placed directly at the top level or within
+# a [script] section for backward compatibility with existing configs.
+
+[script]
+# --- Simulation Backend ---
+# Simulation backend: "mbtrack2" or "pyht"
+code = "mbtrack2"
+
+# --- Particle and Tracking Parameters ---
+# Number of macroparticles per electron bunch
+n_macroparticles = 10000
+
+# Number of turns to simulate
+n_turns = 3000
+
+# Number of segments for transverse tracking
+n_segments = 8
+
+# RF harmonic number
+h_rf = 416
+
+# --- Fill Pattern ---
+# Gap length as a multiple of RF bucket length
+gap_length = 1
+
+# Number of gaps symmetrically distributed along the ring
+n_gaps = 4
+
+# --- Beam Parameters ---
+# Total beam current in Amperes
+beam_current = 0.5
+
+# Use smooth focusing approximation (true/false)
+is_smooth = true
+
+# Emittance ratio (vertical/horizontal)
+emittance_ratio = 0.3
+
+# Charge variation (standard deviation in percent, 0 = no variation)
+charge_variation = 0
+
+# --- Residual Gas and Ionization ---
+# Average residual gas density per species (molecules/m^3)
+# Use array format for multiple gas species
+average_pressure = [2.9e12]
+
+# Pressure variation per gas species (standard deviation in percent)
+pressure_variation = [0]
+
+# Ion molecular mass per species (atomic mass units)
+ion_mass = [44]
+
+# Ionization cross-section per species (m^2)
+sigma_i = [2.79e-22]
+
+# --- Field Models ---
+# Interaction models: "weak", "strong", or "PIC"
+ion_field_model = "weak"
+electron_field_model = "weak"
+
+# --- Feedback and Corrections ---
+# Feedback damping time in turns (0 = no feedback)
+feedback_tau = 0
+
+# Chromaticity [horizontal, vertical]
+chromaticity = [0, 0]
+
+# Enable space charge effects (true/false)
+sc = false
