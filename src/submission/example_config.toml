@@ -1,0 +1,110 @@
+# Example TOML configuration file for beam-ion instability simulation submission.
+#
+# This file contains three main sections:
+# - [environment]: Container and server configuration
+# - [job]: HPC job settings (name, time, resources)
+# - [script]: Simulation parameters
+#
+# Usage:
+#   python submission.py --config_file example_config.toml
+
+title = "Example beam-ion instability simulation configuration"
+
+# =============================================================================
+# Environment Configuration
+# =============================================================================
+[environment]
+# Container image to use for the simulation
+container = "soleil-pa:mbtrack2dev"
+
+# Source and destination paths for container mounts
+mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/"]
+mount_destination = ["/home/dockeruser/bii_tracking/"]
+
+# Server type: "ccrt", "slurm", or "local"
+server = "ccrt"
+
+# =============================================================================
+# Job Configuration
+# =============================================================================
+[job]
+# Unique name for this job (used for output/error file names)
+name = "example_simulation"
+
+# Maximum job time in seconds (86400 = 24 hours)
+time = 86000
+
+# Number of CPUs to allocate
+n_cpu = 24
+
+# HPC partition to use
+partition = "milan"
+
+# Folders for error and output logs
+err_folder = "/ccc/work/cont003/soleil/gubaiduv/err/"
+out_folder = "/ccc/work/cont003/soleil/gubaiduv/out/"
+
+# Set to true if GPU resources are needed
+is_gpu = false
+
+# =============================================================================
+# Simulation Script Parameters
+# =============================================================================
+[script]
+# Path to the simulation script
+name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
+
+# Number of macroparticles per electron bunch
+n_macroparticles = 10000
+
+# Number of turns to simulate
+n_turns = 3000
+
+# Gap length as a multiple of RF bucket length
+gap_length = 1
+
+# Number of gaps symmetrically distributed along the ring
+n_gaps = 4
+
+# Number of segments for transverse tracking
+n_segments = 8
+
+# Use smooth focusing approximation
+is_smooth = true
+
+# RF harmonic number
+h_rf = 416
+
+# Total beam current in Amperes
+beam_current = 0.5
+
+# Interaction models: "weak", "strong", or "PIC"
+ion_field_model = "weak"
+electron_field_model = "weak"
+
+# Charge variation (standard deviation in percent, 0 = no variation)
+charge_variation = 0
+
+# Pressure variation per gas species (standard deviation in percent)
+pressure_variation = [0]
+
+# Average residual gas density per species (molecules/m^3)
+average_pressure = [2.9e12]
+
+# Ionization cross-section per species (m^2)
+sigma_i = [2.79e-22]
+
+# Ion molecular mass per species (atomic mass units)
+ion_mass = [44]
+
+# Simulation backend: "mbtrack2" or "pyht"
+code = "mbtrack2"
+
+# Feedback damping time in turns (0 = no feedback)
+feedback_tau = 0
+
+# Chromaticity [horizontal, vertical] (optional)
+chromaticity = [0, 0]
+
+# Enable space charge effects (optional)
+sc = false
