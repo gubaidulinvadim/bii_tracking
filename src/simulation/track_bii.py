@@ -1,15 +1,41 @@
+import argparse
 import os
-pypath = os.getenv('PYTHONPATH')
-pypath = pypath + ':/home/dockeruser/machine_data'
-os.environ['PYTHONPATH']=pypath
 import sys
-from utils import get_parser_for_bii
-import tomllib 
+import tomllib
+
+pypath = os.getenv('PYTHONPATH', '')
+pypath = pypath + ':/home/dockeruser/machine_data'
+os.environ['PYTHONPATH'] = pypath
+
 # Main parameters for the simulation
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
 # path of the folder where to store the simulation results/data and some of the input
 FOLDER_PATH = '/home/dockeruser/bii_tracking/'
-# FOLDER_PATH = '/home/gubaidulin/scripts/bii_tracking/'
+
+
+def load_config(config_file: str) -> dict:
+    """Load and parse a .toml configuration file.
+
+    Args:
+        config_file: Path to the .toml configuration file.
+
+    Returns:
+        Parsed configuration dictionary.
+
+    Raises:
+        SystemExit: If the configuration file is not found or invalid.
+    """
+    try:
+        with open(config_file, 'rb') as f:
+            return tomllib.load(f)
+    except FileNotFoundError:
+        print(f"Error: Configuration file '{config_file}' not found.")
+        sys.exit(1)
+    except tomllib.TOMLDecodeError as e:
+        print(f"Error: Invalid TOML in '{config_file}': {e}")
+        sys.exit(1)
+
+
 def run(n_macroparticles=int(5e3),
         gap_length=1,
         n_turns=int(3000),
@@ -26,14 +52,14 @@ def run(n_macroparticles=int(5e3),
         ion_mass=[28],
         sigma_i=[1.78e-22],
         feedback_tau=0,
-        chromaticity=[0,0],
+        chromaticity=[0, 0],
         sc=False,
         code='pyht'):
-        if code == 'pyht':
-            import pyht_context as context
-        elif code == 'mbtrack2':
-            import mbtrack2_context as context
-        context.run(n_macroparticles=n_macroparticles,
+    if code == 'pyht':
+        import pyht_context as context
+    elif code == 'mbtrack2':
+        import mbtrack2_context as context
+    context.run(n_macroparticles=n_macroparticles,
                 gap_length=gap_length,
                 n_turns=n_turns,
                 n_segments=n_segments,
@@ -51,17 +77,25 @@ def run(n_macroparticles=int(5e3),
                 chromaticity=chromaticity,
                 sc=sc,
                 feedback_tau=feedback_tau)
-        return 0
+    return 0
 
 
 if __name__ == "__main__":
-    parser = get_parser_for_bii()
+    parser = argparse.ArgumentParser(
+        description="Track beam-ion instability in a light source storage ring using a TOML configuration file."
+    )
     parser.add_argument('--config_file', action='store', metavar='CONFIG_FILE',
                         type=str, default='config.toml',
-                        help='Configuration file in the TOML format.')
+                        help='Configuration file in the TOML format (default: config.toml).')
     args = parser.parse_args()
-    with open(args.config_file, 'rb') as f:
-        config = tomllib.load(f)['script']
+
+    full_config = load_config(args.config_file)
+
+    if 'script' not in full_config:
+        print(f"Error: Configuration file '{args.config_file}' must contain a [script] section.")
+        sys.exit(1)
+
+    config = full_config['script']
 
     run(n_macroparticles=config['n_macroparticles'],
         n_turns=config['n_turns'],
@@ -82,6 +116,5 @@ if __name__ == "__main__":
         feedback_tau=config['feedback_tau'],
         sc=config.get('sc', False),
         chromaticity=config.get('chromaticity', [0, 0]))
-
 
     sys.exit()
