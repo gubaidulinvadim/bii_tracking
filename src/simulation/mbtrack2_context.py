@@ -1,7 +1,6 @@
 import sys
 sys.path.append('../input')
 import numpy as np
-from mbtrack2 import (Electron, Synchrotron)
 from mbtrack2.tracking import (Beam, LongitudinalMap, RFCavity,
                                SynchrotronRadiation, TransverseSpaceCharge)
 from mbtrack2.tracking.aperture import ElipticalAperture
@@ -10,7 +9,7 @@ from mbtrack2.tracking.monitors import IonMonitor
 from mbtrack2.tracking.element import (transverse_map_sector_generator)
 from mbtrack2.tracking.monitors import BeamMonitor
 from mbtrack2.tracking.feedback import TransverseExponentialDamper
-from soleil import v2366_v2
+from facilities_mbtrack2.SOLEIL_II import v3633
 from scipy.constants import m_p, e, c
 from tqdm import tqdm
 
@@ -50,24 +49,10 @@ def run(beam_current=500e-3,
                                     f'{sc=}'+\
                                     f'{emittance_ratio=}'+\
                                         f')'
-    particle = Electron()
     chro = np.array([chromaticity[0], chromaticity[1]])
-    ring2 = v2366_v2(IDs='open', V_RF=1.7e6)
-    ring = Synchrotron(
-        h=ring2.h,
-        optics=ring2.optics,
-        particle=particle,
-        L=ring2.L,
-        E0=ring2.E0,
-        ac=ring2.ac,
-        U0=ring2.U0,
-        tau=ring2.tau,
-        emit=np.array([ring2.emit[0], emittance_ratio*ring2.emit[0]]),
-        tune=ring2.tune,
-        sigma_delta=ring2.sigma_delta,
-        sigma_0=ring2.sigma_0,
-        chro=chro,
-    )
+    ring = v3633(IDs='open', V_RF=1.7e6, load_lattice=True)
+    ring.emit = np.array([ring.emit[0], emittance_ratio*ring.emit[0]])
+    ring.chro = chro
     
     np.random.seed(42)
     beam =_prepare_beam(ring, 
