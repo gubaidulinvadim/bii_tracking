@@ -1,0 +1,5 @@
+# Requirements for fbii_pyht_tracking
+#
+# tomli is only needed for Python versions < 3.11 which don't have
+# the built-in tomllib module. For Python >= 3.11, this is optional.
+tomli>=2.0.0; python_version < "3.11"
