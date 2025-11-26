@@ -183,8 +183,15 @@ class Submitter:
             elif self.server == 'slurm':
                 mount_folder = '/lustre/scratch/sources/physmach/gubaidulin/bii_tracking:/home/dockeruser/bii_tracking'
                 slurm_image_name = '/lustre/scratch/sources/physmach/gubaidulin/pycompletecuda.sif'
-                subprocess.run(['module', 'load', 'singularity'], check=False)
-                subprocess.run(['module', 'load', 'cuda'], check=False)
+                # These module commands may fail on non-HPC systems; suppress errors
+                try:
+                    subprocess.run(['module', 'load', 'singularity'], check=True, capture_output=True)
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    pass  # Module command not available or failed
+                try:
+                    subprocess.run(['module', 'load', 'cuda'], check=True, capture_output=True)
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    pass  # Module command not available or failed
 
                 f.write(f"#SBATCH --partition {job.partition}\n")
                 f.write(f"#SBATCH -n {job.n_cpu}\n")
@@ -214,16 +221,27 @@ class Submitter:
         config_file = job.config_file if job.config_file else "config.toml"
         script_name = self._write_submission_script(job, config_file)
 
-        if self.server == 'ccrt':
-            print(f"Submitting job '{job.name}' to CCRT...")
-            subprocess.run(['ccc_msub', script_name], check=False)
-        elif self.server == 'slurm':
-            print(f"Submitting job '{job.name}' to SLURM...")
-            subprocess.run(['sbatch', script_name], check=False)
-        elif self.server == 'local':
-            print(f"Local mode: job script '{job.name}' created but not submitted.")
-        else:
-            print(f"Unknown server type: {self.server}")
+        try:
+            if self.server == 'ccrt':
+                print(f"Submitting job '{job.name}' to CCRT...")
+                result = subprocess.run(['ccc_msub', script_name], capture_output=True, text=True)
+                if result.returncode != 0:
+                    print(f"Warning: ccc_msub returned non-zero exit code: {result.returncode}")
+                    if result.stderr:
+                        print(f"Error output: {result.stderr}")
+            elif self.server == 'slurm':
+                print(f"Submitting job '{job.name}' to SLURM...")
+                result = subprocess.run(['sbatch', script_name], capture_output=True, text=True)
+                if result.returncode != 0:
+                    print(f"Warning: sbatch returned non-zero exit code: {result.returncode}")
+                    if result.stderr:
+                        print(f"Error output: {result.stderr}")
+            elif self.server == 'local':
+                print(f"Local mode: job script '{job.name}' created but not submitted.")
+            else:
+                print(f"Unknown server type: {self.server}")
+        except FileNotFoundError as e:
+            print(f"Error: Submission command not found: {e}")
 
         if cleanup and os.path.exists(script_name):
             os.remove(script_name)
