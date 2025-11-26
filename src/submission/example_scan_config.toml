@@ -18,7 +18,7 @@ title = "Example parameter scan configuration"
 # Environment Configuration
 # =============================================================================
 [environment]
-container = "soleil-pa:mbtrack2dev"
+container = "soleil-pa:mbtrack2-pic"
 mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/", "/ccc/work/cont003/soleil/gubaiduv/facilities_mbtrack2/"]
 mount_destination = ["/home/dockeruser/bii_tracking/", "/home/dockeruser/facilities_mbtrack2/"]
 server = "ccrt"

@@ -37,6 +37,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
 
     job_name = job.get('name', 'job')
     job_time = job.get('time', 86000)
+    image_name = job.get('environment', 'container')
     n_cpu = job.get('n_cpu', 24)
     partition = job.get('partition', 'milan')
     err_folder = job.get('err_folder', '/ccc/work/cont003/soleil/gubaiduv/err/')
@@ -45,14 +46,6 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
 
     script_name = script.get('name', '/home/dockeruser/bii_tracking/src/simulation/track_bii.py')
     code = script.get('code', 'mbtrack2')
-
-    # Determine image name based on code type
-    if is_gpu:
-        image_name = 'pycompletecuda'
-    elif code == 'pyht':
-        image_name = 'pycomplete'
-    else:
-        image_name = 'mbtrack2_ions'
 
     command_string = get_command_string(config_file, script_name)
     machine_data_folder = "/ccc/work/cont003/soleil/gubaiduv/machine_data"
