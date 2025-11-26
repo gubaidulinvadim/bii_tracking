@@ -70,7 +70,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             f.write("#MSUB -n 1\n")
             f.write(f"#MSUB -c {n_cpu}\n")
             f.write(f"#MSUB -T {job_time}\n")
-            f.write("#MSUB -A soleil\n")
+            f.write("#MSUB -A soldai\n")
             f.write("#MSUB -@ gubaidulinvadim@gmail.com:begin,end,requeue\n")
             f.write(f"#MSUB -o {err_folder}{job_name}.err\n")
             f.write(f"#MSUB -e {out_folder}{job_name}.out\n")
