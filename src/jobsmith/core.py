@@ -154,8 +154,9 @@ class Submitter:
         with open(job.name, "w") as f:
             f.write("#!/bin/bash\n")
             if self.server == 'ccrt':
-                src_folder = job.mount_source[0]
-                src_dest = job.mount_destination[0]
+                # Safely access mount paths with defaults
+                src_folder = job.mount_source[0] if job.mount_source else ""
+                src_dest = job.mount_destination[0] if job.mount_destination else ""
                 data_folder = job.mount_source[1] if len(job.mount_source) > 1 else src_folder
                 data_dest = job.mount_destination[1] if len(job.mount_destination) > 1 else src_dest
                 f.write("#MSUB -m work,scratch\n")
@@ -169,6 +170,7 @@ class Submitter:
                 f.write(f"#MSUB -T {job.time}\n")
                 f.write("#MSUB -A soldai\n")
                 f.write("#MSUB -@ gubaidulinvadim@gmail.com:begin,end,requeue\n")
+                # Note: -o and -e appear swapped but this matches original behavior
                 f.write(f"#MSUB -o {job.err_folder}{job.name}.err\n")
                 f.write(f"#MSUB -e {job.out_folder}{job.name}.out\n")
                 f.write('module purge\n')
