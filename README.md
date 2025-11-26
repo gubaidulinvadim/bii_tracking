@@ -47,3 +47,112 @@ python src/simulation/track_bii.py --help
 
 - Python >= 3.11: Uses built-in `tomllib` for TOML parsing
 - Python < 3.11: Requires `tomli` package (`pip install tomli`)
+
+## Job Submission with jobsmith
+
+The repository provides `jobsmith` - a unified interface for submitting simulation jobs to HPC clusters (CCRT, SLURM) or running locally.
+
+### Installation
+
+Add the `src` directory to your PYTHONPATH:
+
+```bash
+export PYTHONPATH=$PYTHONPATH:/path/to/fbii_pyht_tracking/src
+```
+
+Or install numpy (required dependency):
+
+```bash
+pip install numpy
+```
+
+### Using the CLI
+
+**Submit a single job:**
+
+```bash
+python -m jobsmith.cli submit --config_file config.toml
+```
+
+**Submit a parameter scan:**
+
+```bash
+python -m jobsmith.cli submit-scan --config_file scan_config.toml
+```
+
+**Preview scan without submitting (dry run):**
+
+```bash
+python -m jobsmith.cli submit-scan --config_file scan_config.toml --dry-run
+```
+
+**Keep generated config files after submission:**
+
+```bash
+python -m jobsmith.cli submit-scan --config_file scan_config.toml --keep-configs
+```
+
+### Using the Python API
+
+```python
+from jobsmith import Job, Submitter, submit, submit_scan
+
+# Submit a single job from config file
+submit("config.toml")
+
+# Or use the object-oriented API
+job = Job.from_toml("config.toml")
+submitter = Submitter(server="ccrt")
+submitter.submit(job)
+
+# Submit a parameter scan
+submit_scan("scan_config.toml", dry_run=False)
+```
+
+### Configuration File Format
+
+Configuration files use TOML format with three main sections:
+
+```toml
+[environment]
+container = "soleil-pa:mbtrack2dev"
+mount_source = ["/path/to/source/"]
+mount_destination = ["/path/to/dest/"]
+server = "ccrt"  # or "slurm" or "local"
+
+[job]
+name = "my_simulation"
+time = 86000
+n_cpu = 24
+partition = "milan"
+
+[script]
+name = "/path/to/track_bii.py"
+n_macroparticles = 10000
+n_turns = 3000
+# ... other simulation parameters
+```
+
+For parameter scans, add a `[scan]` section:
+
+```toml
+[scan]
+# Explicit array of values
+beam_current = [0.1, 0.2, 0.3, 0.4, 0.5]
+
+# Or use a range specification (linspace)
+feedback_tau = {start = 10, stop = 100, num = 10}
+```
+
+See `src/submission/example_config.toml` and `src/submission/example_scan_config.toml` for complete examples.
+
+### Migration from Old Submission Scripts
+
+The old submission scripts (`submission/submission.py`, `submission/submit_scan.py`) are deprecated but still work for backward compatibility. Please migrate to `jobsmith`:
+
+| Old Way (Deprecated) | New Way (Recommended) |
+|---------------------|----------------------|
+| `python submission/submission.py --config_file config.toml` | `python -m jobsmith.cli submit --config_file config.toml` |
+| `python submission/submit_scan.py --config_file scan_config.toml` | `python -m jobsmith.cli submit-scan --config_file scan_config.toml` |
+| `from submission.utils import load_config` | `from jobsmith.utils import load_config` |
+| `from submission import submit_scan` | `from jobsmith import submit_scan` |
