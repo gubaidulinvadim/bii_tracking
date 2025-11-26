@@ -10,15 +10,19 @@ This script is maintained for backward compatibility only.
 """
 
 import argparse
-import os
 import sys
 import warnings
 
-# Add parent directory to path for jobsmith import
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from jobsmith import Job, Submitter, submit
-from jobsmith.utils import load_config, validate_config
+# Try to import from jobsmith - it should be available if src is in PYTHONPATH
+try:
+    from jobsmith import Job, Submitter, submit
+    from jobsmith.utils import load_config, validate_config
+except ImportError:
+    # Fallback: add parent directory to path
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from jobsmith import Job, Submitter, submit
+    from jobsmith.utils import load_config, validate_config
 
 
 # Legacy functions for backward compatibility

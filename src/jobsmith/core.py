@@ -5,6 +5,7 @@ submission system.
 """
 
 import os
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
@@ -182,8 +183,8 @@ class Submitter:
             elif self.server == 'slurm':
                 mount_folder = '/lustre/scratch/sources/physmach/gubaidulin/bii_tracking:/home/dockeruser/bii_tracking'
                 slurm_image_name = '/lustre/scratch/sources/physmach/gubaidulin/pycompletecuda.sif'
-                os.system('module load singularity')
-                os.system('module load cuda')
+                subprocess.run(['module', 'load', 'singularity'], check=False)
+                subprocess.run(['module', 'load', 'cuda'], check=False)
 
                 f.write(f"#SBATCH --partition {job.partition}\n")
                 f.write(f"#SBATCH -n {job.n_cpu}\n")
@@ -215,17 +216,17 @@ class Submitter:
 
         if self.server == 'ccrt':
             print(f"Submitting job '{job.name}' to CCRT...")
-            os.system(f'ccc_msub {script_name}')
+            subprocess.run(['ccc_msub', script_name], check=False)
         elif self.server == 'slurm':
             print(f"Submitting job '{job.name}' to SLURM...")
-            os.system(f'sbatch {script_name}')
+            subprocess.run(['sbatch', script_name], check=False)
         elif self.server == 'local':
             print(f"Local mode: job script '{job.name}' created but not submitted.")
         else:
             print(f"Unknown server type: {self.server}")
 
-        if cleanup:
-            os.system(f'rm -rf {script_name}')
+        if cleanup and os.path.exists(script_name):
+            os.remove(script_name)
 
 
 def submit(config_file: str, cleanup: bool = True) -> None:

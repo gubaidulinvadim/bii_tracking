@@ -7,7 +7,6 @@ jobs with varying parameter values.
 import copy
 import itertools
 import os
-import subprocess
 
 import numpy as np
 

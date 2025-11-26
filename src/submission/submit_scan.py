@@ -19,15 +19,19 @@ When multiple parameters are scanned, all combinations are submitted.
 """
 
 import argparse
-import os
 import sys
 import warnings
 
-# Add parent directory to path for jobsmith import
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from jobsmith import submit_scan
-from jobsmith.scan import expand_scan_values, generate_scan_configs
+# Try to import from jobsmith - it should be available if src is in PYTHONPATH
+try:
+    from jobsmith import submit_scan
+    from jobsmith.scan import expand_scan_values, generate_scan_configs
+except ImportError:
+    # Fallback: add parent directory to path
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from jobsmith import submit_scan
+    from jobsmith.scan import expand_scan_values, generate_scan_configs
 
 
 def main():

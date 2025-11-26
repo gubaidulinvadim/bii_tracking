@@ -10,7 +10,6 @@ Migration:
     from jobsmith.utils import load_config, validate_config, write_toml
 """
 
-import os
 import sys
 import warnings
 
@@ -21,10 +20,13 @@ warnings.warn(
     stacklevel=2
 )
 
-# Add parent directory to path for jobsmith import
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Re-export from jobsmith.utils
-from jobsmith.utils import write_toml, load_config, validate_config
+# Try to import from jobsmith - it should be available if src is in PYTHONPATH
+try:
+    from jobsmith.utils import write_toml, load_config, validate_config
+except ImportError:
+    # Fallback: add parent directory to path
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from jobsmith.utils import write_toml, load_config, validate_config
 
 __all__ = ["write_toml", "load_config", "validate_config"]
