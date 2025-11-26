@@ -19,8 +19,8 @@ title = "Example parameter scan configuration"
 # =============================================================================
 [environment]
 container = "soleil-pa:mbtrack2dev"
-mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/"]
-mount_destination = ["/home/dockeruser/bii_tracking/"]
+mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/", "/ccc/work/cont003/soleil/gubaiduv/facilities_mbtrack2/"]
+mount_destination = ["/home/dockeruser/bii_tracking/", "/home/dockeruser/facilities_mbtrack2/"]
 server = "ccrt"
 
 # =============================================================================
@@ -28,7 +28,7 @@ server = "ccrt"
 # =============================================================================
 [job]
 # Base name for jobs (parameter values will be appended)
-name = "feedback_scan"
+name = "example_scan"
 time = 86000
 n_cpu = 24
 partition = "milan"
@@ -72,8 +72,5 @@ feedback_tau = 0
 # Example: feedback_tau = [10, 20] and beam_current = [0.1, 0.2]
 #          generates 4 jobs: (10, 0.1), (10, 0.2), (20, 0.1), (20, 0.2)
 [scan]
-# Scan feedback damping time from 60 down to 20 turns
-feedback_tau = [60, 50, 40, 30, 20]
-
 # Scan beam current using a range specification
 beam_current = {start = 0.1, stop = 0.5, num = 5}
