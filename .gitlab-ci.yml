@@ -1,1 +1,8 @@
+stages:
+  - nothing
+
+noop_job:
+  stage: nothing
+  script:
+    - echo "This pipeline does nothing."
 
