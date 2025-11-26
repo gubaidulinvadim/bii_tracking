@@ -75,11 +75,11 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             if is_gpu:
                 f.write(
                     f"ccc_mprun -C {image_name} -E'--ctr-mount \
-                    src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -E'--ctr-module nvidia' -- "
+                    src={src_folder}:dst={src_dest},src={data_folder}:dst={data_dest}' -E'--ctr-module nvidia' -- "
                     + command_string)
             else:
                 f.write(
-                    f"ccc_mprun -C {image_name} -E'--ctr-mount src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -- "
+                    f"ccc_mprun -C {image_name} -E'--ctr-mount src={src_folder}:dst={src_dest},src={data_folder}:dst={data_dest}' -- "
                     + command_string)
         elif server == 'slurm':
             mount_folder = '/lustre/scratch/sources/physmach/gubaidulin/bii_tracking:/home/dockeruser/bii_tracking'
