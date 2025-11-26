@@ -34,10 +34,11 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
 
     server = env.get('server', 'ccrt')
     mount_source = env.get('mount_source', ['/ccc/work/cont003/soleil/gubaiduv/bii_tracking/'])
+    mount_dest = env.get('mount_destination', ['/home/dockeruser/bii_tracking'])
+    image_name = job.get('container', '')
 
     job_name = job.get('name', 'job')
     job_time = job.get('time', 86000)
-    image_name = job.get('environment', 'container')
     n_cpu = job.get('n_cpu', 24)
     partition = job.get('partition', 'milan')
     err_folder = job.get('err_folder', '/ccc/work/cont003/soleil/gubaiduv/err/')
@@ -53,7 +54,10 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
     with open(job_name, "w") as f:
         f.write("#!/bin/bash\n")
         if server == 'ccrt':
-            src_folder = mount_source[0] if mount_source else '/ccc/work/cont003/soleil/gubaiduv/bii_tracking'
+            src_folder = mount_source[0]
+            src_dest = mount_dest[0]
+            data_folder = mount_source[1]
+            data_dest = mount_dest[1]
             f.write("#MSUB -m work,scratch\n")
             if is_gpu:
                 f.write("#MSUB -q a100\n")
@@ -70,7 +74,8 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             f.write('module purge\n')
             if is_gpu:
                 f.write(
-                    f"ccc_mprun -C {image_name} -E'--ctr-mount src={src_folder};,dst=/home/dockeruser/bii_tracking:src={machine_data_folder},dst=/home/dockeruser/machine_data' -E'--ctr-module nvidia' -- "
+                    f"ccc_mprun -C {image_name} -E'--ctr-mount
+                    src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -E'--ctr-module nvidia' -- "
                     + command_string)
             else:
                 f.write(
