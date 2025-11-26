@@ -74,8 +74,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
             f.write('module purge\n')
             if is_gpu:
                 f.write(
-                    f"ccc_mprun -C {image_name} -E'--ctr-mount \
-                    src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -E'--ctr-module nvidia' -- "
+                    f"ccc_mprun -C {image_name} -E'--ctr-mount src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -E'--ctr-module nvidia' -- "
                     + command_string)
             else:
                 f.write(
