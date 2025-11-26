@@ -35,7 +35,7 @@ def write_tmp_submission_script(config: dict, config_file: str) -> str:
     server = env.get('server', 'ccrt')
     mount_source = env.get('mount_source', ['/ccc/work/cont003/soleil/gubaiduv/bii_tracking/'])
     mount_dest = env.get('mount_destination', ['/home/dockeruser/bii_tracking'])
-    image_name = job.get('container', '')
+    image_name = env.get('container', '')
 
     job_name = job.get('name', 'job')
     job_time = job.get('time', 86000)
