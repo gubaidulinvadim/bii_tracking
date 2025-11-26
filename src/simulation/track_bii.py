@@ -6,9 +6,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import load_toml_config, merge_config_and_args, str_to_bool, parse_json_array
 
-pypath = os.getenv('PYTHONPATH', '')
-pypath = pypath + ':/home/dockeruser/machine_data'
-os.environ['PYTHONPATH'] = pypath
+os.environ["PYTHONPATH"] += os.pathsep + "/home/dockeruser/facilities_mbtrack2/"
+sys.path.append('/home/dockeruser/facilities_mbtrack2')
 
 # Main parameters for the simulation
 PHI_RF = 0  # RF phase, just leave it here, if you are above transition energy
