@@ -12,7 +12,7 @@ import numpy as np
 
 from jobsmith.core import Job, Submitter
 from jobsmith.utils import load_config, validate_config, write_toml
-
+from time import sleep
 
 def expand_scan_values(scan_spec) -> list:
     """Expand a scan specification into a list of values.
@@ -137,6 +137,7 @@ def submit_scan(
             print(f"Submitting [{i}/{len(scan_configs)}]: {job_name}")
             temp_config_file = f"{job_name}_config.toml"
             generated_files.append(temp_config_file)
+            sleep(0.5)
             _submit_single_job(job_config, temp_config_file)
 
     if dry_run:
