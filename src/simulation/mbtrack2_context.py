@@ -89,6 +89,7 @@ def run(beam_current=500e-3,
                                         n_bins=100)
     beam_ion_elements = _prepare_BI(ring,
                                     folder,
+                                    appendix,
                                     n_segments,
                                     h_rf,
                                     n_turns,
@@ -189,7 +190,9 @@ def _prepare_beam(ring,
     return mybeam
     
 def _prepare_BI(ring,
+
                 folder,
+                appendix,
                 n_segments,
                 h_rf,
                 n_turns,
@@ -210,18 +213,18 @@ def _prepare_BI(ring,
                 smooth,
                 emittance_ratio,
                 ):
-    appendix = f'n_turns={int(n_turns)},'+\
-                f'n_gaps={int(n_gaps)},'+\
-                    f'gap_length={int(gap_length)},'+\
-                        f'n_segments={int(n_segments)},'+\
-                            f'charge_var={int(charge_variation)},'+\
-                                f'smooth={smooth},'+\
-                                    f'average_pressure={average_pressure[0]:.1e}'+\
-                                    f'feedback_tau={feedback_tau:}'+\
-                                    f'{chromaticity=:}' +\
-                                    f'{sc=}'+\
-                                    f'{emittance_ratio=}'+\
-                                        f')'
+    # appendix = f'n_turns={int(n_turns)},'+\
+    #             f'n_gaps={int(n_gaps)},'+\
+    #                 f'gap_length={int(gap_length)},'+\
+    #                     f'n_segments={int(n_segments)},'+\
+    #                         f'charge_var={int(charge_variation)},'+\
+    #                             f'smooth={smooth},'+\
+    #                                 f'average_pressure={average_pressure[0]:.1e}'+\
+    #                                 f'feedback_tau={feedback_tau:}'+\
+    #                                 f'{chromaticity=:}' +\
+    #                                 f'{sc=}'+\
+    #                                 f'{emittance_ratio=}'+\
+    #                                     f')'
     beam_ion_elements = []
     np.random.seed(42)
     for i in range(n_segments):
