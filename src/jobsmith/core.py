@@ -169,7 +169,7 @@ class Submitter:
                 f.write(f"#MSUB -c {job.n_cpu}\n")
                 f.write(f"#MSUB -T {job.time}\n")
                 f.write("#MSUB -A soldai\n")
-                f.write("#MSUB -@ gubaidulinvadim@gmail.com:begin,end,requeue\n")
+                f.write("#MSUB -@ vadim.gubaidulin@synchrotron-soleil.fr:begin,end,requeue\n")
                 # Note: -o and -e appear swapped but this matches original behavior
                 f.write(f"#MSUB -o {job.err_folder}{job.name}.err\n")
                 f.write(f"#MSUB -e {job.out_folder}{job.name}.out\n")
@@ -202,7 +202,7 @@ class Submitter:
                 f.write('#SBATCH --export=ALL\n')
                 if job.is_gpu:
                     f.write('#SBATCH --gres=gpu:1\n')
-                f.write("#SBATCH --mail-user='gubaidulinvadim@gmail.com'\n")
+                f.write("#SBATCH --mail-user='vadim.gubaidulin@synchrotron-soleil.fr'\n")
                 f.write('#SBATCH --mail-type=begin,end,requeue\n')
                 f.write(f"#SBATCH --error={job.err_folder}{job.name}.err\n")
                 f.write(f"#SBATCH --output={job.out_folder}{job.name}.out\n")
