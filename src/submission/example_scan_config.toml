@@ -58,7 +58,7 @@ sigma_i = [2.79e-22]
 ion_mass = [44]
 code = "mbtrack2"
 feedback_tau = 0
-emittance_ratio = [0.02]
+emittance_ratio = 0.02
 
 # =============================================================================
 # Scan Parameters
