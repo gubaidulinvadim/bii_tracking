@@ -4,7 +4,7 @@ import sys
 
 # Add parent directory to path for config module import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import load_toml_config, merge_config_and_args, str_to_bool, parse_json_array
+from config import load_toml_config, merge_config_and_args
 
 os.environ["PYTHONPATH"] += os.pathsep + "/home/dockeruser/facilities_mbtrack2/"
 sys.path.append('/home/dockeruser/facilities_mbtrack2')
@@ -76,11 +76,6 @@ Example usage:
   # Using config file only:
   python track_bii.py --config config.toml
 
-  # Using config file with CLI overrides:
-  python track_bii.py --config config.toml --n_turns 5000 --beam_current 0.3
-
-  # Using CLI arguments only (without config file):
-  python track_bii.py --n_macroparticles 10000 --n_turns 3000 --code mbtrack2
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -89,59 +84,6 @@ Example usage:
     parser.add_argument('-c', '--config', metavar='CONFIG_FILE', type=str,
                         default=None,
                         help='Path to TOML configuration file. CLI args override config values.')
-
-    # Legacy config_file argument for backward compatibility
-    parser.add_argument('--config_file', metavar='CONFIG_FILE', type=str,
-                        default=None,
-                        help='(Deprecated) Alias for --config. Use --config instead.')
-
-    # Simulation parameters - all optional with defaults
-    parser.add_argument('--n_macroparticles', type=int, default=None,
-                        help='Number of macroparticles per electron bunch (default: 5000)')
-    parser.add_argument('--gap_length', type=int, default=None,
-                        help='Gap length as multiple of RF bucket length (default: 1)')
-    parser.add_argument('--n_turns', type=int, default=None,
-                        help='Number of turns to simulate (default: 3000)')
-    parser.add_argument('--n_segments', type=int, default=None,
-                        help='Number of segments for transverse tracking (default: 50)')
-    parser.add_argument('--n_gaps', type=int, default=None,
-                        help='Number of gaps symmetrically distributed (default: 4)')
-    parser.add_argument('--h_rf', type=int, default=None,
-                        help='RF harmonic number (default: 416)')
-    parser.add_argument('--ion_field_model', type=str, default=None,
-                        choices=['weak', 'strong', 'PIC'],
-                        help='Ion field model (default: weak)')
-    parser.add_argument('--electron_field_model', type=str, default=None,
-                        choices=['weak', 'strong', 'PIC'],
-                        help='Electron field model (default: strong)')
-    parser.add_argument('--smooth', type=str_to_bool, default=None,
-                        help='Use smooth focusing approximation (default: True)')
-    parser.add_argument('--is_smooth', type=str_to_bool, default=None,
-                        help='Alias for --smooth (for config file compatibility)')
-    parser.add_argument('--charge_variation', type=float, default=None,
-                        help='Charge variation std dev in percent (default: 0.0)')
-    parser.add_argument('--pressure_variation', type=parse_json_array, default=None,
-                        help='Pressure variation per species as JSON array (default: [0.0])')
-    parser.add_argument('--average_pressure', type=parse_json_array, default=None,
-                        help='Average residual gas density per species as JSON array (default: [3.9e12])')
-    parser.add_argument('--beam_current', type=float, default=None,
-                        help='Total beam current in Amperes (default: 0.5)')
-    parser.add_argument('--ion_mass', type=parse_json_array, default=None,
-                        help='Ion molecular mass per species as JSON array (default: [28])')
-    parser.add_argument('--sigma_i', type=parse_json_array, default=None,
-                        help='Ionization cross-section per species as JSON array (default: [1.78e-22])')
-    parser.add_argument('--feedback_tau', type=float, default=None,
-                        help='Feedback damping time in turns, 0=no feedback (default: 0)')
-    parser.add_argument('--chromaticity', type=parse_json_array, default=None,
-                        help='Chromaticity [horizontal, vertical] as JSON array (default: [0, 0])')
-    parser.add_argument('--sc', type=str_to_bool, default=None,
-                        help='Enable space charge effects (default: False)')
-    parser.add_argument('--emittance_ratio', type=float, default=None,
-                        help='Emittance ratio (default: 0.3)')
-    parser.add_argument('--code', type=str, default=None,
-                        choices=['pyht', 'mbtrack2'],
-                        help='Simulation backend (default: pyht)')
-
     args = parser.parse_args()
 
     # Default configuration values
@@ -165,7 +107,7 @@ Example usage:
         'chromaticity': [0, 0],
         'sc': False,
         'emittance_ratio': 0.3,
-        'code': 'pyht'
+        'code': 'mbtrack2'
     }
 
     # Determine which config file to use (--config takes precedence over --config_file)
@@ -191,10 +133,6 @@ Example usage:
     merged = dict(defaults)
     merged.update(config)
     merged = merge_config_and_args(merged, args)
-
-    # Handle 'is_smooth' alias from CLI
-    if args.is_smooth is not None:
-        merged['smooth'] = args.is_smooth
 
     run(n_macroparticles=merged['n_macroparticles'],
         n_turns=merged['n_turns'],
