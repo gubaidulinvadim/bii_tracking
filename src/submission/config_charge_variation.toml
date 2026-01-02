@@ -1,18 +1,4 @@
-# Example TOML configuration file for parameter scan submission.
-#
-# This file extends the standard configuration with a [scan] section
-# that defines arrays of values to scan over. The submit_scan.py script
-# will generate and submit a separate job for each combination of values.
-#
-# Usage:
-#   python submit_scan.py --config_file example_scan_config.toml
-#
-# The [scan] section can contain any parameter from [script].
-# Each parameter can be specified as:
-# - An array of explicit values: [10, 20, 30, 40, 50]
-# - A range specification: {start = 0.1, stop = 0.5, num = 5} (uses linspace)
-
-title = "Example parameter scan configuration"
+title = "Charge variation configuration file"
 
 # =============================================================================
 # Environment Configuration
@@ -58,20 +44,11 @@ sigma_i = [2.79e-22]
 ion_mass = [44]
 code = "mbtrack2"
 feedback_tau = 0
-emittance_ratio = 0.02
+emittance_ratio = 0.3
 
 # =============================================================================
 # Scan Parameters
 # =============================================================================
-# The [scan] section defines which parameters to vary.
-# Each key corresponds to a parameter in [script].
-# Values can be:
-#   - Explicit array: [10, 20, 30, 40, 50]
-#   - Range with linspace: {start = 0.1, stop = 0.5, num = 5}
-#
-# When multiple parameters are specified, all combinations are scanned.
-# Example: feedback_tau = [10, 20] and beam_current = [0.1, 0.2]
-#          generates 4 jobs: (10, 0.1), (10, 0.2), (20, 0.1), (20, 0.2)
 [scan]
 # Scan beam current using a range specification
-beam_current = [0.025, 0.075, 0.125, 0.175, 0.225, 0.275, 0.325, 0.375, 0.425, 0.475]
+charge_variation = [0, 0.01, 0.02, 0.04, 0.08, 0.16]
