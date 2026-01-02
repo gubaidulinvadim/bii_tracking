@@ -109,8 +109,7 @@ Example usage:
         'code': 'mbtrack2'
     }
 
-    # Determine which config file to use (--config takes precedence over --config_file)
-    config_path = args.config if args.config else args.config_file
+    config_path = args.config_file
 
     # Load config from file if provided
     if config_path:
