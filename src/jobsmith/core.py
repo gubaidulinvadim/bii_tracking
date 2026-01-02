@@ -180,7 +180,7 @@ class Submitter:
                         + command_string)
                 else:
                     f.write(
-                        f"ccc_mprun -C {job.container} -E'--ctr-mount src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -- "
+                        f"ccc_mprun -C {job.container} -E'--ctr-mount src={src_folder},dst={src_dest}:src={data_folder},dst={data_dest}' -E'--ctr-module openmpi-4.1.4' -- "
                         + command_string)
             elif self.server == 'slurm':
                 mount_folder = '/lustre/scratch/sources/physmach/gubaidulin/bii_tracking:/home/dockeruser/bii_tracking'
