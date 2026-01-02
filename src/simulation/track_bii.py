@@ -80,7 +80,7 @@ Example usage:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('-c', '--config-file', metavar='CONFIG_FILE', type=str,
+    parser.add_argument('-c', '--config_file', metavar='CONFIG_FILE', type=str,
                         default=None,
                         help='Path to TOML configuration file. CLI args override config values.')
     args = parser.parse_args()
