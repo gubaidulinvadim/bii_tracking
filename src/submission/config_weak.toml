@@ -27,7 +27,7 @@ is_gpu = false
 # =============================================================================
 [script]
 name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
-folder = '/home/dockeruser/bii_tracking/data/models/'
+folder = '/home/dockeruser/bii_tracking/data/models/weak/'
 n_macroparticles = 10000
 n_turns = 3000
 gap_length = 1
@@ -53,4 +53,4 @@ emittance_ratio = 0.3
 [scan]
 # Scan beam current using a range specification
 
-ion_field_model = ["weak", "PIC"]
+ion_field_model = ["weak"]
