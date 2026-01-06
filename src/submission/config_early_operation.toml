@@ -1,0 +1,109 @@
+
+title = "Pessimistic vacuum pressure scenario"
+
+# =============================================================================
+# Environment Configuration
+# =============================================================================
+[environment]
+container = "soleil-pa:mbtrack2-pic"
+mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/", "/ccc/work/cont003/soleil/gubaiduv/facilities_mbtrack2/"]
+mount_destination = ["/home/dockeruser/bii_tracking/", "/home/dockeruser/facilities_mbtrack2/"]
+server = "ccrt"
+
+# =============================================================================
+# Job Configuration
+# =============================================================================
+[job]
+# Base name for jobs (parameter values will be appended)
+name = "example_scan"
+time = 86000
+n_cpu = 24
+partition = "milan"
+err_folder = "/ccc/work/cont003/soleil/gubaiduv/err/"
+out_folder = "/ccc/work/cont003/soleil/gubaiduv/out/"
+is_gpu = false
+
+# =============================================================================
+# Simulation Script Parameters (base values)
+# =============================================================================
+[script]
+name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
+n_macroparticles = 10000
+n_turns = 3000
+gap_length = 1
+n_gaps = 4
+n_segments = 8
+is_smooth = true
+h_rf = 416
+beam_current = 0.5
+ion_field_model = "weak"
+electron_field_model = "weak"
+charge_variation = 0
+pressure_variation = [0]
+average_pressure = [2.9e12]
+sigma_i = [2.79e-22]
+ion_mass = [44]
+code = "mbtrack2"
+feedback_tau = 0
+emittance_ratio = 0.3
+
+# =============================================================================
+# Scan Parameters
+# =============================================================================
+[scan]
+# Scan beam current using a range specification
+charge_variation = [0, 0.01, 0.02, 0.04, 0.08, 0.16]
+title = ""
+
+# =============================================================================
+# Environment Configuration
+# =============================================================================
+[environment]
+container = "soleil-pa:mbtrack2-pic"
+mount_source = ["/ccc/work/cont003/soleil/gubaiduv/bii_tracking/", "/ccc/work/cont003/soleil/gubaiduv/facilities_mbtrack2/"]
+mount_destination = ["/home/dockeruser/bii_tracking/", "/home/dockeruser/facilities_mbtrack2/"]
+server = "ccrt"
+
+# =============================================================================
+# Job Configuration
+# =============================================================================
+[job]
+# Base name for jobs (parameter values will be appended)
+name = "example_scan"
+time = 86000
+n_cpu = 24
+partition = "milan"
+err_folder = "/ccc/work/cont003/soleil/gubaiduv/err/"
+out_folder = "/ccc/work/cont003/soleil/gubaiduv/out/"
+is_gpu = false
+
+# =============================================================================
+# Simulation Script Parameters (base values)
+# =============================================================================
+[script]
+name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
+n_macroparticles = 10000
+n_turns = 3000
+gap_length = 1
+n_gaps = 4
+n_segments = 8
+is_smooth = true
+h_rf = 416
+beam_current = 0.5
+ion_field_model = "weak"
+electron_field_model = "weak"
+charge_variation = 0
+pressure_variation = [0]
+average_pressure = [2.9e12]
+sigma_i = [2.79e-22]
+ion_mass = [44]
+code = "mbtrack2"
+feedback_tau = 0
+emittance_ratio = 0.3
+
+# =============================================================================
+# Scan Parameters
+# =============================================================================
+[scan]
+# Scan beam current using a range specification
+charge_variation = [0, 0.01, 0.02, 0.04, 0.08, 0.16]
