@@ -34,7 +34,8 @@ def run(n_macroparticles=int(5e3),
         chromaticity=[0, 0],
         sc=False,
         emittance_ratio=0.3,
-        code='pyht'):
+        code='pyht',
+        folder='/home/dockeruser/bii_tracking/data/'):
     if code == 'pyht':
         import pyht_context as context
     elif code == 'mbtrack2':
@@ -60,7 +61,8 @@ def run(n_macroparticles=int(5e3),
                 chromaticity=chromaticity,
                 sc=sc,
                 feedback_tau=feedback_tau,
-                emittance_ratio=emittance_ratio)
+                emittance_ratio=emittance_ratio,
+                folder=folder)
     return 0
 
 
@@ -151,6 +153,7 @@ Example usage:
         feedback_tau=merged['feedback_tau'],
         sc=merged['sc'],
         chromaticity=merged['chromaticity'],
-        emittance_ratio=merged['emittance_ratio'])
+        emittance_ratio=merged['emittance_ratio'],
+        folder=merged['folder'])
 
     sys.exit()

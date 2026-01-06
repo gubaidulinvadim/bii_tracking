@@ -28,6 +28,7 @@ is_gpu = false
 # =============================================================================
 [script]
 name = "/home/dockeruser/bii_tracking/src/simulation/track_bii.py"
+folder = '/home/dockeruser/bii_tracking/data/segments/'
 n_macroparticles = 10000
 n_turns = 1000
 gap_length = 1

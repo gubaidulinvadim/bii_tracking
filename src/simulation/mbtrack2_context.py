@@ -40,7 +40,8 @@ def run(beam_current=500e-3,
         chromaticity=[0,0],
         sc=False,
         feedback_tau = 0,
-        emittance_ratio=0.3):
+        emittance_ratio=0.3,
+        folder='/home/dockeruser/bii_tracking/data/'):
     appendix = f'(Ib={int(beam_current*1e3)}mA,'+\
         f'n_macroparticles={n_macroparticles:.1e},'+\
             f'n_turns={int(n_turns)},'+\
@@ -71,7 +72,6 @@ def run(beam_current=500e-3,
                                                 n_segments,
                                                 h_rf,
                                                 smooth)
-    folder = '/home/dockeruser/bii_tracking/data/'
     beam_monitor = BeamMonitor(ring.h,
                                save_every=1,
                                buffer_size=int(n_turns//4),
@@ -402,6 +402,7 @@ if __name__ == "__main__":
         chromaticity=merged['chromaticity'],
         sc=merged['sc'],
         feedback_tau=merged['feedback_tau'],
-        emittance_ratio=merged['emittance_ratio'])
+        emittance_ratio=merged['emittance_ratio'],
+        folder=merged['folder'])
 
     sys.exit()
